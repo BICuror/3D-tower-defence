@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f995b20f77f9fd443a8a4bedf70a8d9c, type: 3}
+  m_Name: EnemyWavesData
+  m_EditorClassIdentifier: 
+  _possibleGroups:
+  - {fileID: 11400000, guid: e080b1fb0cd02b14eb8b01921e7297ac, type: 2}
+  _defaultEnemies:
+  - _enemyData: {fileID: 11400000, guid: c1de2e8fa0e57cb4daf570d39ee50590, type: 2}
+    _wheight: 0
+  - _enemyData: {fileID: 11400000, guid: d083d5000a95b9343b087e9fa8a37138, type: 2}
+    _wheight: 6
+  _tankEnemies:
+  - _enemyData: {fileID: 0}
+    _wheight: 0
+  _rangerEnemies:
+  - _enemyData: {fileID: 0}
+    _wheight: 0
+  _supportEnemies:
+  - _enemyData: {fileID: 0}
+    _wheight: 0
+  _healerEnemies:
+  - _enemyData: {fileID: 0}
+    _wheight: 0
+  _quickieEnemies:
+  - _enemyData: {fileID: 0}
+    _wheight: 0
