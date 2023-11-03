@@ -21,8 +21,8 @@ public sealed class EnemySpawner : MonoBehaviour
         //LastEnemyKilled.AddListener(TrySpawnEnemy);
     }
 
-    private void OnDestroy() => FindObjectOfType<EnemySpawnerSystem>().RemoveSpawner(this);
-
+    public void DeactivateSpawner() => FindObjectOfType<EnemySpawnerSystem>().RemoveSpawner(this);
+    
     public bool AllEnemiesDead() => _spawnedEnemies.Count == 0;
 
 
@@ -43,10 +43,7 @@ public sealed class EnemySpawner : MonoBehaviour
 
             spawnedEnemy.transform.position = transform.position;
 
-            spawnedEnemy.gameObject.GetComponent<UnityEngine.AI.NavMeshAgent>().enabled = true;
-            spawnedEnemy.gameObject.GetComponent<AgentLinkMover>().enabled = true;
-
-            spawnedEnemy.DeathEvent.AddListener(RemoveEnemy);
+            spawnedEnemy.EnemyDeathEvent.AddListener(RemoveEnemy);
 
             EnemySpawned.Invoke(spawnedEnemy.gameObject);
         }
@@ -56,10 +53,7 @@ public sealed class EnemySpawner : MonoBehaviour
     {
         _spawnedEnemies.Remove(enemyHealth.gameObject);
 
-        enemyHealth.DeathEvent.RemoveListener(RemoveEnemy);
-
-        enemyHealth.gameObject.GetComponent<UnityEngine.AI.NavMeshAgent>().enabled = false;
-        enemyHealth.gameObject.GetComponent<AgentLinkMover>().enabled = false;
+        enemyHealth.EnemyDeathEvent.RemoveListener(RemoveEnemy);
 
         if (_spawnedEnemies.Count == 0) LastEnemyKilled?.Invoke();
     }

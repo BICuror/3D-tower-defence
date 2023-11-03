@@ -4,13 +4,35 @@ using UnityEngine;
 
 public sealed class IslandData : ScriptableObject
 {
-    [Header("ObjectsSettings")][Space] 
+    [Header("EniviromentSettings")][Space]
+    [SerializeField] private GameObject _eniviromentObject;
+    public GameObject EniviromentObject => _eniviromentObject; 
 
-    [SerializeField] private GameObject _townHallPrefab;
-    public GameObject TownHallPrefab {get => _townHallPrefab;}
 
+    [Header("TextureSettings")][Space] 
+    [SerializeField] private Texture _eniviromentTexture;
+    public Texture EniviromentTexture => _eniviromentTexture;
+
+    [SerializeField] private Texture _buildingsTexture;
+    public Texture BuildingsTexture => _buildingsTexture;
+
+    [Header("RoadSettings")][Space] 
+    [SerializeField] private RoadType _roadType;
+    public RoadType RoadTypeToGenerate => _roadType;
+
+    [SerializeField] private SpawnerPositionValidator _spawnerPositionValidator;
+    public SpawnerPositionValidator SpawnerPositionValidator => _spawnerPositionValidator;
+    public enum RoadType
+    {
+        Node,
+        Random
+    }
+    
     [SerializeField] private CubeTextures _roadBlock;
     public CubeTextures RoadBlock {get => _roadBlock;}
+
+    [SerializeField] private CubeTextures _roadBlockOnWater;
+    public CubeTextures RoadBlockOnWater {get => _roadBlockOnWater;}
 
     [SerializeField] private int _amountOfRoadNodesBetweenCenterAndEdge; 
     public int AmountOfRoadNodesBetweenCenterAndEdge {get => _amountOfRoadNodesBetweenCenterAndEdge;}
@@ -53,22 +75,15 @@ public sealed class IslandData : ScriptableObject
     {
         [Range(0f, 1f)] public float DecorationAppearRate;
         public Decoration[] Decorations; 
+
     }
 
     [System.Serializable] public struct Decoration
     {
-        public GameObject[] Prefabs;
-        public int Amount;
-        [Range(0f, 1f)] public float AppearRate;
-        public float MinScale, MaxScale;
-        
-        [Header("Position")][Space] 
-        [Range(0f, 1f)] public float PlacmentOffset;
+        [Range(0f, 1f)] [SerializeField] private float _appearRate;
+        public float AppearRate => _appearRate;
 
-        [Header("RandomRotation")][Space] 
-        [Range(0f, 180f)]public float MaxXRotation;
-        [Range(0f, 180f)]public float MaxYRotation;
-        [Range(0f, 180f)]public float MaxZRotation;
+        public DecorationData DecorationData; 
     }
     
     [Header("BiomesGenerationSettings")][Space] 
@@ -89,13 +104,18 @@ public sealed class IslandData : ScriptableObject
     [SerializeField] private EnemyBiomeStage[] _enemyBiomeStages;
     public EnemyBiomeStage[] EnemyBiomeStages {get => _enemyBiomeStages;}
     
-    public CubeTextures CorruptionBlock;
+    [SerializeField] private CubeTextures _corruptionBlock;
+    public CubeTextures CorruptionBlock => _corruptionBlock;   
+
+    [SerializeField] private CubeTextures _corruptionBlockOnWater;
+    public CubeTextures CorruptionBlockOnWater => _corruptionBlockOnWater;        
+    
+    [SerializeField] private int _corruptionLessZeroHeight;
+    public int CorruptionLessZeroHeight {get => _corruptionLessZeroHeight;}
+
 
     [System.Serializable] public struct EnemyBiomeStage
     {
-        [SerializeField] private int _lessZeroHeight;
-        public int LessZeroHeight {get => _lessZeroHeight;}
-
         public DecorationModule DecorationsModule;
 
         [SerializeField] private int _enemyBiomeRadius;

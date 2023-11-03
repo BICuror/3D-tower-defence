@@ -4,37 +4,26 @@ using UnityEngine.VFX;
 
 public abstract class Effect : ScriptableObject 
 {
-    [Header("UI VisualSettings")]
-
-    [SerializeField] private Material _uIMaterial;
-    public Material UIMaterial {get => _uIMaterial;}
-
     [Header("EffectVisualSettings")]
     [SerializeField] private VisualEffectPoolObjectHandler _effectPrefab;
+    [SerializeField] private float _instantiationHeight;
+    public float InstantiationHeight => _instantiationHeight;
 
     [SerializeField] private int _initialEffectPoolSize;
 
     protected ObjectPool<VisualEffectPoolObjectHandler> _visualEffectsPool; 
 
-    public void TryInstaitiateVisualEffectsPool()
+    public void InstaitiateVisualEffectsPool()
     {
-        if (_visualEffectsPool == null)
-        {
-            _visualEffectsPool = new ObjectPool<VisualEffectPoolObjectHandler>(_effectPrefab, _initialEffectPoolSize);
-            
-            SceneManager.sceneLoaded += DestroyVisualEffectsPool;
-        }
+        _visualEffectsPool = new ObjectPool<VisualEffectPoolObjectHandler>(_effectPrefab, _initialEffectPoolSize);
     }   
 
-    private void DestroyVisualEffectsPool(Scene scene, LoadSceneMode loadSceneMode)
+    public VisualEffectPoolObjectHandler GetEffectObject() 
     {
-        SceneManager.sceneLoaded -= DestroyVisualEffectsPool;
+        if (EffectInitialisationChecker.Instance.EffectIsInitialized(this) == false) InstaitiateVisualEffectsPool();
 
-        _visualEffectsPool = null;
+        return _visualEffectsPool.GetNextPooledObject();
     }
-
-    public VisualEffectPoolObjectHandler GetEffectObject() => _visualEffectsPool.GetNextPooledObject();
-
     public abstract EffectType GetEffectType();
 
     public abstract bool CanBeApplied(EntityComponentsContainer componentsContainer);

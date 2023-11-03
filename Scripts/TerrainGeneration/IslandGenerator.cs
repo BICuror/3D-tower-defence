@@ -1,103 +1,86 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+using Zenject;
 
-public class IslandGenerator : MonoBehaviour
+public sealed class IslandGenerator : MonoBehaviour
 {
-    public bool GenerateDecorations;
+    #region Dependencies
+    [Inject] private IslandData _islandData;
 
-    public bool GenerateEnemiesAndRoads;
+    [Inject] private TextureManager _textureManager;
 
-    public UnityEvent IslandGenerated;
+    [Inject] private IslandDecorationGenerator _decorationGenerator;
+
+    [Inject] private EnemyBiomeGenerator _enemyBiomeGenerator;
+
+    [Inject] private ResourceSourceGenerator _resourceSourceGenerator;
+
+    [Inject] private EnviromentCreator _enviromentCreator;
+
+    [Inject] private BiomeMapGenerator _biomeMapGenerator;
+
+    [Inject] private HeightMapGenerator _heightMapGenerator;
+
+    [Inject] private WaveManager _waveManager; 
+
+    [Inject] private RoadGenerator _roadGenerator;
+
+    [Inject] private RoadNodeGenerator _nodeGenerator;
+    #endregion
 
     private BlockGrid _blockGrid;
+    public BlockGrid IslandGrid => _blockGrid;
 
     [SerializeField] private TerrainSetter _terrainSetter;
 
-    [SerializeField] private RoadGenerator _roadGenerator;
-
-    [SerializeField] private TextureManager _textureManager;
-
-    [SerializeField] private IslandDecorationGenerator _decorationGenerator;
-
-    [SerializeField] private GameObject _townHall;
-
-    [SerializeField] private EnemyBiomeGenerator _enemyBiomeGenerator;
-
-    [SerializeField] private ResourceSourceGenerator _resourceSourceGenerator;
-
-    [SerializeField] private TerrainAnimator _roadAnimator;
-
-    private BiomeMapGenerator _biomeMapGenerator;
-
-    private HeightMapGenerator _heightMapGenerator;
-
     private int[,] _heightMap;
+
+    [SerializeField] private bool _generateTerrainAndDecorationsOnly;
     
     private void Start() => GenerateIsland();
 
     public void GenerateIsland()
     {
-        SetupBiomes();
+        GenerateNewSeeds();
 
-        SetupHeightMap();
-        
-        _textureManager.SetBiomeMap(_biomeMapGenerator);
+        GetHeightMap();
 
         ConvertHeightMapToBlockGrid();
 
         GenerateTerrainMesh();
-
-        if (GenerateDecorations)
-        {
-            _decorationGenerator.SetBiomeMap(_biomeMapGenerator);
             
-            _decorationGenerator.GenerateDecorations(_blockGrid, Vector2Int.zero);
-        }
-        
-        if (GenerateEnemiesAndRoads)
+        _decorationGenerator.GenerateDecorations(_blockGrid, Vector2.zero);
+
+        _nodeGenerator.SetupNodes();        
+
+        CreateEnviroment();
+        _enemyBiomeGenerator.Setup(_blockGrid);
+
+        if (_generateTerrainAndDecorationsOnly == false) 
         {
-            _enemyBiomeGenerator.Setup(_blockGrid); 
-
-            _roadAnimator.SetCenter(new Vector3((IslandDataContainer.GetData().IslandSize - 1) / 2, 0f, (IslandDataContainer.GetData().IslandSize - 1) / 2));
+            //_resourceSourceGenerator.GenerateResources();
+            _waveManager.PrepeareWave();
         }
-
-        InstantiateTownhall();
-
-        _resourceSourceGenerator.GenerateResources();
-
-        IslandGenerated.Invoke();
     }
 
-    public void GenerateRoads()
+    private void GenerateNewSeeds()
     {
-        _roadGenerator.GenerateRoads(_heightMap);
+        _heightMapGenerator.GenerateNewSeed();
+
+        _biomeMapGenerator.GenerateNewSeed();
     }
 
-    private void SetupBiomes()
+    private void GetHeightMap()
     {
-        _biomeMapGenerator = new BiomeMapGenerator();
-
-        _biomeMapGenerator.GenerateNewBiomeSeed();
-    }
-
-    private void SetupHeightMap()
-    {
-        _heightMapGenerator = new HeightMapGenerator();
-
-        _heightMapGenerator.SetNewHeightSeed();
-
         _heightMap = _heightMapGenerator.GenerateHeightMap(_biomeMapGenerator);
     }
     
     private void ConvertHeightMapToBlockGrid()
     {
-        _blockGrid = new BlockGrid(IslandDataContainer.GetData().IslandSize, IslandDataContainer.GetData().IslandMaxHeight);
+        _blockGrid = new BlockGrid(_islandData.IslandSize, _islandData.IslandMaxHeight);
 
-        for (int x = 0; x < IslandDataContainer.GetData().IslandSize; x++)
+        for (int x = 0; x < _islandData.IslandSize; x++)
         {        
-            for (int z = 0; z < IslandDataContainer.GetData().IslandSize; z++)
+            for (int z = 0; z < _islandData.IslandSize; z++)
             {
                 if (_heightMap[x, z] > 0) _blockGrid.SetBlockType(new Vector3Int(x, _heightMap[x, z], z), BlockType.Surface);  
 
@@ -120,12 +103,10 @@ public class IslandGenerator : MonoBehaviour
         _terrainSetter.SetMesh(mesh);
     }
 
-    private void InstantiateTownhall()
+    private void CreateEnviroment()
     {
-        int _centerPoint = Mathf.RoundToInt(IslandDataContainer.GetData().IslandSize / 2);
+        int _centerPoint = Mathf.RoundToInt(_islandData.IslandSize / 2);
 
-        _townHall.transform.position = new Vector3(_centerPoint, _heightMap[_centerPoint, _centerPoint] + 1f, _centerPoint);
-
-        Instantiate(IslandDataContainer.GetData().TownHallPrefab, _townHall.transform.position, Quaternion.identity, _townHall.transform);
+        _enviromentCreator.CreateEnviroment(new Vector3(_centerPoint, _heightMap[_centerPoint, _centerPoint], _centerPoint));
     }
 }

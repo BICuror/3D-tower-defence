@@ -8,4 +8,8 @@ public abstract class PermanentOverTimeEffect : Effect
     public override EffectType GetEffectType() => EffectType.PermanentOverTime;
 
     public abstract void ApplyTickEffectToEntity(EntityComponentsContainer componentsContainer);
+    
+    public override sealed void ApplyToEntity(EntityComponentsContainer componentsContainer) {}
+
+    public override sealed void RemoveFromEntity(EntityComponentsContainer componentsContainer) {}
 }

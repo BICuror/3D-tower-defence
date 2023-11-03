@@ -13,8 +13,32 @@ MonoBehaviour:
   m_Name: EnemyBiomeBlock
   m_EditorClassIdentifier: 
   _xTexture:
-  - {fileID: 865613971, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1305516280, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 736936911, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1604908065, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1397832395, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -507292832, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 742640839, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 18671310, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -807244216, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 320987112, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
   _yTexture:
-  - {fileID: 865613971, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1305516280, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 736936911, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1604908065, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1397832395, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -507292832, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 742640839, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 18671310, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -807244216, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 320987112, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
   _zTexture:
-  - {fileID: 865613971, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1305516280, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 736936911, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1604908065, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1397832395, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -507292832, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 742640839, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 18671310, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -807244216, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 320987112, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}

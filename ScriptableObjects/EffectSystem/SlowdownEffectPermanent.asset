@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c368276d9c0514a49a26347b976be9be, type: 3}
   m_Name: SlowdownEffectPermanent
   m_EditorClassIdentifier: 
-  _uIMaterial: {fileID: 2100000, guid: 73a27ce0f61d9d044b2963b3d0c80f9e, type: 2}
-  _slowdownStrength: 0.938
+  _effectPrefab: {fileID: 1527745684440505230, guid: 8b224ca6885f4da48a4525139f9347a6, type: 3}
+  _instantiationHeight: -0.2
+  _initialEffectPoolSize: 3
+  _slowdownStrength: 0.678

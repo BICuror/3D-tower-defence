@@ -15,6 +15,14 @@ MonoBehaviour:
   _xTexture:
   - {fileID: 545896158, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
   _yTexture:
-  - {fileID: -1312094092, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 624438810, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -250258895, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 33307762, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1950168861, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -364339429, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 1767753839, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: 2054693745, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -2001098641, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
+  - {fileID: -1906904820, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}
   _zTexture:
   - {fileID: 545896158, guid: cd0ef0f65df8aa1468287888b4c0c10d, type: 3}

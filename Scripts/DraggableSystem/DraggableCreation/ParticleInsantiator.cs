@@ -2,10 +2,21 @@ using UnityEngine;
 
 public sealed class ParticleInsantiator : MonoBehaviour
 {
-    [SerializeField] private GameObject _particle;
+    [SerializeField] private VisualEffectPoolObjectHandler _particlePrefab;
 
-    public void InstantiateParticle(GameObject gameObject)
+    private ObjectPool<VisualEffectPoolObjectHandler> _effectPool;
+
+    private void Awake()
     {
-        Instantiate(_particle, gameObject.transform.position, Quaternion.identity);
+        _effectPool = new ObjectPool<VisualEffectPoolObjectHandler>(_particlePrefab, 2);
+    } 
+
+    public void InstantiateParticle(GameObject placedObject)
+    {
+        Transform visualEffectObject = _effectPool.GetNextPooledObject().transform;
+
+        visualEffectObject.position = placedObject.transform.position;
+
+        visualEffectObject.rotation = placedObject.transform.rotation;
     }
 }

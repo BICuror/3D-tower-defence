@@ -1,93 +1,43 @@
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.Events;
-using System.Collections.Generic;
-using System.Collections;
 
 public sealed class ResourceGatherer : MonoBehaviour
 {
     [SerializeField] private float _damageAmount;
 
-    public UnityEvent ReachedDestination;
+    [SerializeField] private ResourceSourceAreaDetector _resourceSourceAreaDetector;
 
-    public UnityEvent SourceDestroyed;
+    [SerializeField] private MeshRenderer _mesh;
 
-    private ResourceSource _currentSource;
-
-    private NavMeshAgent _agent;
-
-    private void Awake() => _agent = GetComponent<NavMeshAgent>();
-
-    public void FindObjectToGather()
+    private void Awake() 
     {
-        List<ResourceSource> resourceSourceList = ResourceSourcesList.GetList();
-
-        for (int i = resourceSourceList.Count - 1; i >= 0; i--)
-        {
-            if (!HasSameHeight(resourceSourceList[i].transform.position.y) || !IsReachable(resourceSourceList[i].transform.position) && Vector3.Distance(transform.position, resourceSourceList[i].transform.position) > 2f)
-            {
-                resourceSourceList.RemoveAt(i);
-            }
-        }
-
-        float minimalDistance = float.MaxValue;
-        int bestIndex = -1;
-
-        for (int i = 0; i < resourceSourceList.Count; i++)
-        {
-            float currentDistance = Vector3.Distance(resourceSourceList[i].transform.position, transform.position);
-
-            if (currentDistance < minimalDistance)
-            {
-                minimalDistance = currentDistance;
-                bestIndex = i;
-            }
-        }
-
-        if (bestIndex != -1)
-        {
-            _currentSource = resourceSourceList[bestIndex];
-
-            _agent.SetDestination(_currentSource.transform.position);
-
-            StartCoroutine(CheckIfReachedDestination());
-        }
-    }   
+        GetComponent<TaskCycle>().ShouldWorkDelegate = ReturnTrue;
     
-    private bool IsReachable(Vector3 position)
-    {
-        NavMeshPath path = new NavMeshPath();
-        _agent.CalculatePath(position, path);
-        
-        return (path.status != NavMeshPathStatus.PathPartial);
+        GetComponent<DraggableObject>().Placed.AddListener(RotateTowardsSource);
+    
+        _resourceSourceAreaDetector.RemovedComponent.AddListener(RotateTowardsSource); 
     }
 
-    private bool HasSameHeight(float value)
-    {
-        return (int)(transform.position.y) == (int)(value);
-    }
+    private bool ReturnTrue() => _resourceSourceAreaDetector.IsEmpty() == false;
 
-    private IEnumerator CheckIfReachedDestination()
-    {
-        YieldInstruction instruction = new WaitForSeconds(0.25f);
+    private void RotateTowardsSource(ResourceSource source) => RotateTowardsSource();
 
-        while (Vector3.Distance(transform.position, _currentSource.transform.position) > 1f)
+    private void RotateTowardsSource()
+    {
+        if (_resourceSourceAreaDetector.IsEmpty() == false)
         {
-            yield return instruction;
-        }  
+            Vector3 sourcePosition = _resourceSourceAreaDetector.GetFirstEntityHealth().transform.position;
+    
+            _mesh.transform.LookAt(sourcePosition);
 
-        ReachedDestination.Invoke();
+            _mesh.transform.Rotate(-32f, 180f, 0f);
+        }
     }
 
     private void GatherResources()
     {
-        _currentSource.DecreaseDurability(_damageAmount);
+        EntityHealth currentSource = _resourceSourceAreaDetector.GetFirstEntityHealth();
 
-        if (_currentSource.IsEmpty())
-        {
-            FindObjectToGather();
-
-            SourceDestroyed.Invoke();
-        }
+        currentSource.GetHurt(_damageAmount);
     }
 }

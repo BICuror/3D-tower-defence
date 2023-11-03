@@ -2,6 +2,6 @@ public sealed class MovingUIElement : IngameUIElement
 {
     private void Update() 
     {
-        LookAtCamera();
+        LookAtCamera(CameraRotationController.Instance.Position);
     }
 }

@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _craftRequirements:
   - _resource: {fileID: 11400000, guid: 3c8409a9a8709fb4681c9e1b69a8909c, type: 2}
-    _resourceAmount: 1
+    _resourceAmount: 3
   _resultPrefab: {fileID: 5831701976978186503, guid: 8c8de7dfc470c274a886b2494a927256, type: 3}

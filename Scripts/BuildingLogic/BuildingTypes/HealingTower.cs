@@ -4,90 +4,132 @@ using UnityEngine;
 
 public sealed class HealingTower : MonoBehaviour
 {
-    [SerializeField] private BuildingsAreaScaner _buildingAreaScaner;
+    [Header("Stats")]
+    [SerializeField] private float _healAmount;
 
-    private TaskCycle _taskCycle;
+    [Header("Links")]
+    [SerializeField] private BuildingHealthAreaScaner _buildingHealthAreaScaner;
 
-    private EntityHealth _buildingToHeal;
+    [SerializeField] private BeamSystem _beamSystem;
 
-    private Building _erectableBuilding;
+    private EntityHealth _currentBuilding;
 
-    [SerializeField] private LineRenderer _lineRenderer;
- 
-    [SerializeField] private float _healSpeed;
+    private BuildingTaskCycle _buildingTaskCycle;
 
-    public void Work()
-    {
-        _buildingToHeal.Heal(_healSpeed);
-    }
+    private Building _building;
 
     private void Start()
     {
-        _taskCycle = GetComponent<TaskCycle>();
-        _erectableBuilding = GetComponent<Building>();
-        _taskCycle.ShouldWorkDelegate = LOL;
+        _buildingTaskCycle = GetComponent<BuildingTaskCycle>();
+        _buildingTaskCycle.ShouldWorkDelegate = ShouldWork;
+        _buildingTaskCycle.TaskPerformed.AddListener(HealBuilding);
+        
 
-        _buildingAreaScaner.ErectedBuildingAdded.AddListener(AddBuilding);
-        _buildingAreaScaner.ErectedBuildingRemoved.AddListener(RemoveBuilding);
+        _buildingHealthAreaScaner.HealthComponentAdded.AddListener(TrySettingNewBuilding);
+        _buildingHealthAreaScaner.HealthComponentRemoved.AddListener(TryRemovingBuilding);
+
+        _buildingHealthAreaScaner.HealthComponentAdded.AddListener(SubscribeToBuilding);
+        _buildingHealthAreaScaner.HealthComponentRemoved.AddListener(UnsubscribeToBuilding);
+
+        _building = GetComponent<Building>();
+        _building.PickedUp.AddListener(_beamSystem.DisableBeam);
+        _building.PickedUp.AddListener(ClearBuilding);
+        _building.BuildCompleted.AddListener(_beamSystem.SetBeamPositionToSource);
     }
 
-    private void AddBuilding(Building building)
-    {
-        building.gameObject.GetComponent<EntityHealth>().HealthChanged.AddListener(TryToFindBuildingToHeal);
+    private void ClearBuilding() => _currentBuilding = null;
 
-        if (_buildingToHeal == null || building.gameObject.GetComponent<EntityHealth>().GetHealthPrcentage() < _buildingToHeal.GetHealthPrcentage())
+    private void SubscribeToBuilding(EntityHealth building) => building.Damaged.AddListener(TryToHealOnHurt);
+    private void UnsubscribeToBuilding(EntityHealth building) => building.Damaged.RemoveListener(TryToHealOnHurt);
+
+    private bool ShouldWork() 
+    {
+        if (_buildingHealthAreaScaner.IsEmpty()) return false;
+
+        IReadOnlyList<EntityHealth> buildings = _buildingHealthAreaScaner.GetHealthComponentsList();
+
+        for (int i = 0; i < buildings.Count; i++)
         {
-            TryToFindBuildingToHeal();
+            if (buildings[i].GetHealthPrcentage() < 1f) return true; 
+        }
+
+        if (_currentBuilding != null) 
+        {
+            _currentBuilding = null;
+            _beamSystem.ReturnBeam(); 
+        }
+        return false;
+    }
+
+    private void TrySettingNewBuilding(EntityHealth building)
+    {
+        if (_building.IsBuilt() && _currentBuilding == null && ShouldWork())
+        {
+            SetNewBuilding();
         }
     }
 
-    private void RemoveBuilding(Building building)
+    private void TryRemovingBuilding(EntityHealth building)
     {
-        building.gameObject.GetComponent<EntityHealth>().HealthChanged.RemoveListener(TryToFindBuildingToHeal);
-
-        if (building.gameObject == _buildingToHeal.gameObject)
+        if (_currentBuilding == (building as BuildingHealth))
         {
-            TryToFindBuildingToHeal();
+            _currentBuilding = null;
+
+            if (ShouldWork()) SetNewBuilding();
+            else _beamSystem.ReturnBeam();
         }
     }
 
-    public bool LOL() => _buildingToHeal != null && _erectableBuilding.IsBuilt();
+    private void TryToHealOnHurt()
+    {
+        if (_currentBuilding == null && _building.IsBuilt()) 
+        {
+            SetNewBuilding();       
+        }
+    }
 
-    private void TryToFindBuildingToHeal()
+    private void SetNewBuilding()
     {
         float leastHp = 1f;
 
         int index = 0;
 
-        List<Building> buildings = _buildingAreaScaner.GetErectedBuildings();
+        IReadOnlyList<EntityHealth> buildings = _buildingHealthAreaScaner.GetHealthComponentsList();
 
         for (int i = 0; i < buildings.Count; i++)
         {
-            float buildingHp = buildings[i].gameObject.GetComponent<EntityHealth>().GetHealthPrcentage();
+            float buildingHealth = buildings[i].GetHealthPrcentage();
 
-            if (buildingHp < leastHp)
+            if (buildingHealth < leastHp)
             {
-                leastHp = buildingHp;
-
                 index = i;
+                leastHp = buildingHealth;
             }
         }
 
-        if (leastHp < 1) // found something
+        _currentBuilding = buildings[index];
+
+        _buildingTaskCycle.StartCycle();
+
+        _beamSystem.StartBeamTranstionToPosition(_currentBuilding.transform);
+    }
+
+    private void HealBuilding()
+    {
+        _currentBuilding.Heal(_healAmount);
+
+        if (_currentBuilding.GetHealthPrcentage() == 1f)
         {
-            _buildingToHeal = buildings[index].gameObject.GetComponent<EntityHealth>();
+            _currentBuilding = null;
 
-            _lineRenderer.SetPositions(new Vector3[2]{transform.position, _buildingToHeal.gameObject.transform.position});
-
-            _taskCycle.StartSycle();
-        }
-        else 
-        {
-            _buildingToHeal = null;
-
-            _lineRenderer.SetPositions(new Vector3[2]{transform.position, transform.position});
-
-            _taskCycle.StopCycle();
+            if (ShouldWork()) 
+            {
+                SetNewBuilding();
+            }
+            else
+            {
+                _beamSystem.ReturnBeam();
+            }
         }
     }
 }

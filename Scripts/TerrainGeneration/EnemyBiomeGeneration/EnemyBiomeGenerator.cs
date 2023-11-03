@@ -1,101 +1,57 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
-public class EnemyBiomeGenerator : MonoBehaviour
+public sealed class EnemyBiomeGenerator : MonoBehaviour
 {
-    [SerializeField] private NodeGenerator _nodeGenerator;
+    [Inject] private IslandData _islandData;
+    [Inject] private RoadNodeGenerator _roadNodeGenerator;
+    [Inject] private IslandGenerator _islandGenerator;
+    [Inject] private RoadMapGenerator _roadMapGenerator;
+    [Inject] private SpawnerRoadNodeGenerator _spawnerRoadNodeGenerator;
+    [Inject] private EnemyBiomeContainer _enemyBiomeContainer;
 
-    [SerializeField] private TextureManager _textureManager;
+    [Inject] private TextureManager _textureManager;
     
-    [SerializeField] private GameObject _enemyBiomePrefab;
+    [SerializeField] private EnemyBiome _enemyBiomePrefab;
 
     [SerializeField] private DecorationContainer _islandDecorationContainer;
 
-    [SerializeField] private CorruptionBiomeMeshGenerator _corruptionBiomeMeshGenerator;
+    private EnemyBiomeMeshGenerator _corruptionBiomeMeshGenerator;
 
     private BlockGrid _terrainBlockGrid;
-
-    private List<EnemyBiome> _enemyBiomes = new List<EnemyBiome>();
 
     public void Setup(BlockGrid islandBlockGrid)
     {
         _terrainBlockGrid = islandBlockGrid;
-
-        _nodeGenerator.SetupNodes();
-
-        for (int i = 0; i < IslandDataContainer.GetData().BegginingAmountOfEnemyBiomes - 1; i++)
-        {
-            TryGenerateNewBiome();
-        }
     }
 
-    public void DisableBiomesTerrain(float duration)
+    private void Awake() 
     {
-        for (int i = 0; i < _enemyBiomes.Count; i++)
-        {
-            _enemyBiomes[i].DisableTerrain(duration);    
-        }
-    }
+        _corruptionBiomeMeshGenerator = new EnemyBiomeMeshGenerator();
 
-    public void EnableBiomesTerrain(float duration)
-    {
-        for (int i = 0; i < _enemyBiomes.Count; i++)
-        {
-            _enemyBiomes[i].EnableTerrain(duration);    
-        }
-    }
-
-    public void IncreaseBiomesStages()
-    {
-        for (int i = 0; i < _enemyBiomes.Count; i++)
-        {
-            _enemyBiomes[i].IncreaseCurrentStage();
-
-            if (_enemyBiomes[i].GetStage() >= IslandDataContainer.GetData().EnemyBiomeStages.Length)
-            {
-                Destroy(_enemyBiomes[i].gameObject);
-
-                _enemyBiomes.RemoveAt(i);
-            }
-        }
-    }
-
-    public void RegenerateBiomes()
-    {
-        for (int i = 0; i < _enemyBiomes.Count; i++)
-        {
-            _enemyBiomes[i].RegenerateBiome();
-        }
+        _corruptionBiomeMeshGenerator.SetupGenerator(_islandGenerator.IslandGrid, _textureManager);
     }
 
     public void TryGenerateNewBiome()
     {
-        if (IslandDataContainer.GetData().MaxAmountOfEnemyBiomes > _enemyBiomes.Count) GenerateNewBiome();
+        if (_islandData.MaxAmountOfEnemyBiomes > _enemyBiomeContainer.EnemyBiomeAmount) GenerateNewBiome();
     }
 
     private void GenerateNewBiome()
     {
-        Vector2Int enemySpawnerNode = _nodeGenerator.GetEnemySpawnerNodes(GetEnemyBiomesPositions());
+        IReadOnlyList<Vector2Int> enemyBiomesIndexes = _enemyBiomeContainer.GetEnemyBiomesNodeIndexes();
 
-        GameObject biome = Instantiate(_enemyBiomePrefab, new Vector3(enemySpawnerNode.x, 0f, enemySpawnerNode.y), Quaternion.identity);
+        Vector2Int spawnerNodeIndex = _spawnerRoadNodeGenerator.GetRandomEnemySpawnerNodeIndex(enemyBiomesIndexes);
 
-        biome.GetComponent<EnemyBiome>().SetCenterPosition(enemySpawnerNode);    
+        Vector2Int spawnerPosition = _roadNodeGenerator.GetNodePosition(spawnerNodeIndex);
 
-        biome.GetComponent<EnemyBiome>().Setup(_terrainBlockGrid, _textureManager, _islandDecorationContainer, _corruptionBiomeMeshGenerator);      
+        EnemyBiome biome = Instantiate(_enemyBiomePrefab, new Vector3(spawnerPosition.x, 0f, spawnerPosition.y), Quaternion.identity);
 
-        _enemyBiomes.Add(biome.GetComponent<EnemyBiome>());
-    }
+        biome.SetCenterPosition(spawnerPosition);    
 
-    public List<Vector2Int> GetEnemyBiomesPositions()
-    {
-        List<Vector2Int> result = new List<Vector2Int>();
+        biome.Setup(_textureManager, _terrainBlockGrid, _islandDecorationContainer, spawnerNodeIndex, _islandData, _roadMapGenerator, _corruptionBiomeMeshGenerator);      
 
-        for (int i = 0; i < _enemyBiomes.Count; i++)
-        {
-            result.Add(_enemyBiomes[i].GetCenterPosition());
-        }
-        
-        return result;
+        _enemyBiomeContainer.AddBiome(biome);
     }
 }

@@ -11,4 +11,8 @@ public abstract class RemoveOverTicksEffect : Effect
     public override EffectType GetEffectType() => EffectType.RemoveOverTicks;
 
     public abstract void ApplyTickEffectToEntity(EntityComponentsContainer componentsContainer);
+
+    public override sealed void ApplyToEntity(EntityComponentsContainer componentsContainer) {}
+
+    public override sealed void RemoveFromEntity(EntityComponentsContainer componentsContainer) {}
 }

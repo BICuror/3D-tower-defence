@@ -4,8 +4,8 @@ public sealed class StaticUIElement : IngameUIElement
 {
     private void Start()
     {
-        _cameraRotationController.CameraChangedPosition.AddListener(LookAtCamera);
+        CameraRotationController.Instance.CameraRotationUpdated.AddListener(LookAtCamera);
     }
     
-    private void OnDestroy() => _cameraRotationController.CameraChangedPosition.RemoveListener(LookAtCamera);
+    private void OnDestroy() => CameraRotationController.Instance.CameraRotationUpdated.RemoveListener(LookAtCamera);
 }

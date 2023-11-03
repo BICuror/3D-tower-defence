@@ -4,62 +4,115 @@ using System.Collections.Generic;
 
 public class HealthBar : MonoBehaviour
 {
-    [SerializeField] private Material _healthBarMaterial;
+    private float _decreaseTime = 0.2f;
 
-    private Material _currentHealthBarMaterial;
+    private float _timeBeforeDecrease = 0.8f;
 
-    [SerializeField] private float _decreaseAcceleration = 2f;
+    private float _shakeDuration = 0.27f;
 
-    [SerializeField] private float _startDecreaseSpeed = 0.01f;
+    private float _shakeStrength = 6f;
 
-    private float _currentDecreaseSpeed;
+    private MeshRenderer _meshRenderer;
 
-    private void OnEnable() => CreateAndSetNewMaterial();
-    
-    private void CreateAndSetNewMaterial()
+    private float _lastSetHealthDifferecne;
+
+    private YieldInstruction _yieldInstruction = new WaitForFixedUpdate();
+
+    private void Awake()
     {
-        _currentHealthBarMaterial = new Material(_healthBarMaterial);
+        _meshRenderer = GetComponent<MeshRenderer>();
 
-        gameObject.GetComponent<MeshRenderer>().material = _currentHealthBarMaterial;
+        _meshRenderer.SetPropertyBlock(new MaterialPropertyBlock());
     }
 
-    public void UpdateValue(float healthPercent)
+    public void SetValue(float health) => SetPropertyBlock(health, health);
+
+    public void DecreaseValue(float currentHealth, float healthDifference)
     {
-        if (gameObject.activeSelf == false) return;
+        if (_lastSetHealthDifferecne < healthDifference) _lastSetHealthDifferecne = healthDifference;
+        else _lastSetHealthDifferecne *= 0.95f;
 
-        float health = _currentHealthBarMaterial.GetFloat("Health");
+        SetPropertyBlock(currentHealth, _lastSetHealthDifferecne);
 
-        _currentHealthBarMaterial.SetFloat("Health", healthPercent);
-
-        StartDecreasingHealthDifference(health);
-    }
-
-    private void StartDecreasingHealthDifference(float health)
-    {
         StopAllCoroutines();
 
-        _currentDecreaseSpeed = _startDecreaseSpeed;
-
-        StartCoroutine(SliderDecrease(health));
+        StartCoroutine(StartDecreasingHealthDifference(currentHealth));
     }
 
-    private IEnumerator SliderDecrease(float healthDifference)
+    public void IncreaseValue(float currentHealth)
     {
-        yield return new WaitForFixedUpdate();
+        float healthDifference = currentHealth;
 
-        _currentDecreaseSpeed *= _decreaseAcceleration;
-        
-        healthDifference -= _currentDecreaseSpeed;
-        
-        _currentHealthBarMaterial.SetFloat("HealthDifference", healthDifference);
+        StopAllCoroutines();
 
-        if (healthDifference > _currentHealthBarMaterial.GetFloat("Health")) 
+        ShakeSlider();
+
+        if (currentHealth < _lastSetHealthDifferecne) healthDifference = _lastSetHealthDifferecne;
+            
+        SetPropertyBlock(currentHealth, healthDifference);
+    }
+
+    private void SetPropertyBlock(float currentHealth, float healthDifference)
+    {
+        MaterialPropertyBlock healthDifferenceBlock = new MaterialPropertyBlock();
+        healthDifferenceBlock.SetFloat("Health", currentHealth);
+        healthDifferenceBlock.SetFloat("HealthDifference", healthDifference);
+        _meshRenderer.SetPropertyBlock(healthDifferenceBlock);
+    }
+
+    private IEnumerator StartDecreasingHealthDifference(float currentHealth)
+    {
+        StartCoroutine(ShakeSlider());
+
+        yield return new WaitForSeconds(_timeBeforeDecrease);
+
+        StartCoroutine(DecreaseSlider(currentHealth));
+    }
+
+    private IEnumerator ShakeSlider()
+    {
+        SetToDefaultPosition();
+
+        float amountOfSetps = Mathf.RoundToInt(50f * _shakeDuration);
+
+        float rotationValue = Random.Range(0.7f, 1.5f);
+        if (Random.Range(0, 100) > 50) rotationValue *= -1;
+
+        float positionValue = Random.Range(0.7f, 1.5f);
+        if (Random.Range(0, 100) > 50) positionValue *= -1;
+
+        for(int i = 0; i <= amountOfSetps; i++)
         {
-            StartCoroutine(SliderDecrease(healthDifference));
+            float evaluatedValue = i / amountOfSetps;
+
+            transform.Rotate(0f, rotationValue * Mathf.Sin(Mathf.Deg2Rad * evaluatedValue * 720f) * _shakeStrength, 0f);
+
+            transform.localPosition = new Vector3(0f, 0f, positionValue * Mathf.Sin(Mathf.Deg2Rad * evaluatedValue * 360) * _shakeStrength * 0.02f);
+            
+            yield return _yieldInstruction;
         }
-        else
+    }
+
+    private IEnumerator DecreaseSlider(float currentHealth)
+    {
+        float amountOfSetps = Mathf.RoundToInt(50f * _decreaseTime);
+
+        float healthDecreaseStep = (_lastSetHealthDifferecne - currentHealth) / amountOfSetps;
+
+        for(int i = 0; i < amountOfSetps; i++)
         {
-            _currentHealthBarMaterial.SetFloat("HealthDifference", _currentHealthBarMaterial.GetFloat("Health"));
+            _lastSetHealthDifferecne -= healthDecreaseStep;
+
+            SetPropertyBlock(currentHealth, _lastSetHealthDifferecne);
+            
+            yield return _yieldInstruction;
         }
+    }
+
+    private void SetToDefaultPosition()
+    {
+        transform.localRotation = Quaternion.identity;
+
+        transform.localPosition = Vector3.zero;
     }
 }

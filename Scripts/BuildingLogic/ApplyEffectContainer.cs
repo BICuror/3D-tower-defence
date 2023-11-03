@@ -4,11 +4,13 @@ using UnityEngine.Events;
 
 public sealed class ApplyEffectContainer : MonoBehaviour
 {
-    private List<Effect> _applyEffects = new List<Effect>(); 
+    [SerializeField] private List<Effect> _applyEffects = new List<Effect>(); 
 
     public UnityEvent ApplyEffectUpdated;
 
     public List<Effect> GetApplyEffects() => _applyEffects;
+
+    public int GetAmountOfEffects() => _applyEffects.Count;
 
     public void RemoveEffect(Effect effectToRemove)
     {

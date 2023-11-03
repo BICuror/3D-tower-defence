@@ -1,11 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Zenject;
 
 public sealed class HeightMapGenerator
 {
+    [Inject] private IslandData _islandData;
+
     private BiomeMapGenerator _biomeMapGenerator;
 
     private Vector2 _heightSeed;
+
+    private int[,] _heightMap;
+    public int[,] HeightMap => _heightMap;
 
     Vector2Int[] _clearingDirections = new Vector2Int[4]
     {
@@ -15,22 +21,20 @@ public sealed class HeightMapGenerator
         new Vector2Int(0, -1)
     };
 
-    public void SetNewHeightSeed()
+    public void GenerateNewSeed()
     {
         _heightSeed = new Vector2(Random.Range(-100000f, 100000f), Random.Range(-100000f, 100000f));
     }
 
     public int[,] GenerateHeightMap(BiomeMapGenerator biomeMapGenerator)
     {
-        IslandData islandData = IslandDataContainer.GetData();
-
         _biomeMapGenerator = biomeMapGenerator;
 
-        float[,] heightMap = new float[islandData.IslandSize, islandData.IslandSize];
+        float[,] heightMap = new float[_islandData.IslandSize, _islandData.IslandSize];
 
-        for (int x = 0; x < islandData.IslandSize; x++)
+        for (int x = 0; x < _islandData.IslandSize; x++)
         {
-            for (int y = 0; y < islandData.IslandSize; y++)
+            for (int y = 0; y < _islandData.IslandSize; y++)
             {
                 float height = GetHeight(new Vector2Int(x, y));
 
@@ -40,13 +44,15 @@ public sealed class HeightMapGenerator
 
         ApplyEdgeReductionMap(heightMap);
         
-        if (islandData.CenterShouldBeFlat) heightMap = GetFlatHeightMap(heightMap);
+        if (_islandData.CenterShouldBeFlat) heightMap = GetFlatCenterHeightMap(heightMap);
 
-        if (islandData.IslandSmoothingType != IslandData.SmoothingType.None) heightMap = SmoothHeightMap(heightMap);
+        if (_islandData.IslandSmoothingType != IslandData.SmoothingType.None) heightMap = SmoothHeightMap(heightMap);
 
         int[,] roundedHeightMap = TransformHeightMapToInt(heightMap);
 
         ClearSingleBlocks(roundedHeightMap);
+
+        _heightMap = roundedHeightMap;
 
         return roundedHeightMap;
     }
@@ -68,12 +74,10 @@ public sealed class HeightMapGenerator
     {
         float result = 0;
 
-        IslandData islandData = IslandDataContainer.GetData();
-
         for (int i = 0; i < noiseSettings.Length; i++)
         {
-            float perlinNoiseX = _heightSeed.x + position.x / (float)islandData.IslandSize * noiseSettings[i].NoiseScale.x;
-            float perlinNoiseY = _heightSeed.y + position.y / (float)islandData.IslandSize * noiseSettings[i].NoiseScale.y;
+            float perlinNoiseX = _heightSeed.x + position.x / (float)_islandData.IslandSize * noiseSettings[i].NoiseScale.x;
+            float perlinNoiseY = _heightSeed.y + position.y / (float)_islandData.IslandSize * noiseSettings[i].NoiseScale.y;
 
             float height = noiseSettings[i].NoiseCurve.Evaluate(Mathf.PerlinNoise(perlinNoiseX, perlinNoiseY));
 
@@ -87,35 +91,31 @@ public sealed class HeightMapGenerator
 
     private void ApplyEdgeReductionMap(float[,] heightMap)
     {
-        IslandData islandData = IslandDataContainer.GetData();
+        int half = (int)(_islandData.IslandSize / 2);
 
-        int half = (int)(islandData.IslandSize / 2);
-
-        float highBorder = half * islandData.EdgePrecantageCutout;
+        float highBorder = half * _islandData.EdgePrecantageCutout;
         float range = half - highBorder;
 
-        for (int x = 0; x < islandData.IslandSize; x++)
+        for (int x = 0; x < _islandData.IslandSize; x++)
         {
-            for (int z = 0; z < islandData.IslandSize; z++)
+            for (int z = 0; z < _islandData.IslandSize; z++)
             {
                 float distance = Vector2Int.Distance(new Vector2Int(half, half), new Vector2Int(x, z)) - highBorder;
 
-                heightMap[x, z] *= islandData.BorderCurve.Evaluate(1 - distance / range);
+                heightMap[x, z] *= _islandData.BorderCurve.Evaluate(1 - distance / range);
             }
         }
     }
 
     private float[,] SmoothHeightMap(float[,] initialHeightMap)
     {   
-        IslandData islandData = IslandDataContainer.GetData();
-
         Vector2Int[] directions = GetSmoothingDirections();
 
-        float[,] smoothedHeightMap = new float[islandData.IslandSize, islandData.IslandSize];
+        float[,] smoothedHeightMap = new float[_islandData.IslandSize, _islandData.IslandSize];
 
-        for (int x = 1; x < islandData.IslandSize - 1; x++)
+        for (int x = 1; x < _islandData.IslandSize - 1; x++)
         {
-            for (int y = 1; y < islandData.IslandSize - 1; y++)
+            for (int y = 1; y < _islandData.IslandSize - 1; y++)
             {
                 float averageHeightAround = 0f;
 
@@ -126,7 +126,7 @@ public sealed class HeightMapGenerator
 
                 averageHeightAround /= directions.Length;
 
-                smoothedHeightMap[x, y] = Mathf.Lerp(initialHeightMap[x, y], averageHeightAround, islandData.SmoothingStrength);
+                smoothedHeightMap[x, y] = Mathf.Lerp(initialHeightMap[x, y], averageHeightAround, _islandData.SmoothingStrength);
             }
         }
 
@@ -135,11 +135,9 @@ public sealed class HeightMapGenerator
 
     private Vector2Int[] GetSmoothingDirections()
     {
-        IslandData islandData = IslandDataContainer.GetData();
-
         Vector2Int[] directions;
 
-        if (islandData.IslandSmoothingType == IslandData.SmoothingType.CloseNeibours)
+        if (_islandData.IslandSmoothingType == IslandData.SmoothingType.CloseNeibours)
         {
             directions = new Vector2Int[4]
             {
@@ -169,13 +167,11 @@ public sealed class HeightMapGenerator
 
     private int[,] TransformHeightMapToInt(float[,] heightMap)
     {
-        IslandData islandData = IslandDataContainer.GetData();
+        int[,] roundedHeightMap = new int[_islandData.IslandSize, _islandData.IslandSize];
 
-        int[,] roundedHeightMap = new int[islandData.IslandSize, islandData.IslandSize];
-
-        for (int x = 1; x < islandData.IslandSize - 1; x++)
+        for (int x = 1; x < _islandData.IslandSize - 1; x++)
         {
-            for (int y = 1; y < islandData.IslandSize - 1; y++)
+            for (int y = 1; y < _islandData.IslandSize - 1; y++)
             {
                 roundedHeightMap[x, y] = Mathf.RoundToInt(heightMap[x, y]);
             }
@@ -186,15 +182,13 @@ public sealed class HeightMapGenerator
 
     private void ClearSingleBlocks(int[,] heightMap)
     {
-        IslandData islandData = IslandDataContainer.GetData();
-
-        for (int x = 1; x < islandData.IslandSize - 1; x++)
+        for (int x = 1; x < _islandData.IslandSize - 1; x++)
         {
-            for (int y = 1; y < islandData.IslandSize - 1; y++)
+            for (int y = 1; y < _islandData.IslandSize - 1; y++)
             {
-                if (islandData.ClearSingleSolidBlocks) TryClearSolidBlock(heightMap, x, y);
+                if (_islandData.ClearSingleSolidBlocks) TryClearSolidBlock(heightMap, x, y);
 
-                if (islandData.ClearSingleEmptyBlocks) TryClearEmptyBlock(heightMap, x, y);
+                if (_islandData.ClearSingleEmptyBlocks) TryClearEmptyBlock(heightMap, x, y);
             }
         }
     }
@@ -251,21 +245,19 @@ public sealed class HeightMapGenerator
         }
     }
 
-    private float[,] GetFlatHeightMap(float[,] heightMap)
+    private float[,] GetFlatCenterHeightMap(float[,] heightMap)
     {
-        IslandData islandData = IslandDataContainer.GetData();
-
         List<Vector2Int> indexesOfCenter = new List<Vector2Int>();
 
-        int middleIndex = islandData.MiddleIndex;
+        int middleIndex = _islandData.MiddleIndex;
 
         float heightSumm = 0f;
 
-        for (int x = 0; x < islandData.IslandSize; x++)
+        for (int x = 0; x < _islandData.IslandSize; x++)
         {
-            for (int z = 0; z < islandData.IslandSize; z++)
+            for (int z = 0; z < _islandData.IslandSize; z++)
             {
-                if (Mathf.Abs(middleIndex - x) + Mathf.Abs(middleIndex - z) <= islandData.FlatRadius)
+                if (Mathf.Abs(middleIndex - x) + Mathf.Abs(middleIndex - z) <= _islandData.FlatRadius)
                 {
                     heightSumm += heightMap[x, z];
 
@@ -278,7 +270,7 @@ public sealed class HeightMapGenerator
 
         for (int i = 0; i < indexesOfCenter.Count; i++)
         {
-            heightMap[indexesOfCenter[i].x, indexesOfCenter[i].y] = heightSumm + islandData.FlatHeightIncrease; 
+            heightMap[indexesOfCenter[i].x, indexesOfCenter[i].y] = heightSumm + _islandData.FlatHeightIncrease; 
         }
 
         return heightMap;

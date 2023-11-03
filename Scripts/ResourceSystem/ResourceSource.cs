@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 public sealed class ResourceSource : MonoBehaviour
 {
-    public UnityEvent<ResourceSource> Died;
+    public UnityEvent<ResourceSource> SourceDestroyed;
 
     [SerializeField] private DraggableObject _resourcePrefab;
 
@@ -14,38 +14,41 @@ public sealed class ResourceSource : MonoBehaviour
 
     private void Awake()
     {
-        _entityHealth.DestroyEvent.AddListener(DestroySource);
-    }
-
-    public void DecreaseDurability(float amount)
-    {
-        _entityHealth.GetHurt(amount);
-
-        CheckToCreateResource(_entityHealth.GetHealthPrcentage());
+        _entityHealth.DeathEvent.AddListener(DestroySource);
+    
+        _entityHealth.Damaged.AddListener(CheckToCreateResource);
     }
 
     public void DestroySource(GameObject obj)
     {
-        Died.Invoke(this);
+        CreateAllLeftResourses();
+
+        SourceDestroyed.Invoke(this);
     }
 
-    public bool IsEmpty() => _createdResources == _amountOfRecourses;
-
-    public void CheckToCreateResource(float health)
+    private void CreateAllLeftResourses()
     {
-        if (health < 0 ) health = 0;
+        for (int i = 0; i < _amountOfRecourses - _createdResources; i++)
+        {
+            DraggableCreator.Instance.CreateDraggableOnRandomPosition(_resourcePrefab, transform.position);
+        }
+    }
+
+    private void CheckToCreateResource()
+    {
+        float health = _entityHealth.GetHealthPrcentage();
 
         float missingHealth = 1f - health;
 
         float step = 1f / (float)_amountOfRecourses;
 
-        int resourcesToCreate = Mathf.RoundToInt((missingHealth - (_createdResources * step)) / step);
+        int resourcesToCreate = (int)((missingHealth - (_createdResources * step)) / step);
 
         _createdResources += resourcesToCreate;
 
         for (int i = 0; i < resourcesToCreate; i++)
         {
-            DraggableCreator.Instance.CreateDraggable(_resourcePrefab, transform.position);
+            DraggableCreator.Instance.CreateDraggableOnRandomPosition(_resourcePrefab, transform.position);
         }
     }
 }

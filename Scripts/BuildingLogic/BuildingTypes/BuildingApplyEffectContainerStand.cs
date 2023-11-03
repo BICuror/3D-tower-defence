@@ -3,52 +3,29 @@ using UnityEngine;
 
 public sealed class BuildingApplyEffectContainerStand : MonoBehaviour
 {
-    [SerializeField] private BuildingsAreaScaner _buildingAreaScaner;
+    [SerializeField] private ApplyEffectContainerAreaScaner _applyEffectContainerAreaScaner;
 
     [SerializeField] private Effect[] _applyEffects;
 
-    private void Start()
+    private void Awake()
+    {
+       _applyEffectContainerAreaScaner.PlacedComponentAdded.AddListener(AddEffectToContainer);
+       _applyEffectContainerAreaScaner.PlacedComponentRemoved.AddListener(RemoveEffectFromContainer);
+    }
+
+    private void AddEffectToContainer(ApplyEffectContainer container)
     {
         for (int i = 0; i < _applyEffects.Length; i++)
         {
-            _applyEffects[i].TryInstaitiateVisualEffectsPool();
-        }
-
-        _buildingAreaScaner.ErectedBuildingAdded.AddListener(TryAddEffectToContainer);
-        _buildingAreaScaner.ErectedBuildingRemoved.AddListener(TryRemoveEffectFromContainer);
-    }
-
-    private void TryAddEffectToContainer(Building building)
-    {
-        if (building.gameObject.TryGetComponent(out ApplyEffectContainer container))
-        {
-            for (int i = 0; i < _applyEffects.Length; i++)
-            {
-                container.AddEffect(_applyEffects[i]);
-            }
+            container.AddEffect(_applyEffects[i]);
         }
     }
 
-    private void TryRemoveEffectFromContainer(Building building)
+    private void RemoveEffectFromContainer(ApplyEffectContainer container)
     {
-        if (building.gameObject.TryGetComponent(out ApplyEffectContainer container))
+        for (int i = 0; i < _applyEffects.Length; i++)
         {
-            for (int i = 0; i < _applyEffects.Length; i++)
-            {
-                container.RemoveEffect(_applyEffects[i]);
-            }
-        }
-    }
-    
-    private void OnDestroy() => RemoveAllEffects();
-
-    private void RemoveAllEffects()
-    {
-        List<Building> building = _buildingAreaScaner.GetErectedBuildings();
-
-        for (int i = 0; i < building.Count; i++)
-        {
-            TryRemoveEffectFromContainer(building[i]);
+            container.RemoveEffect(_applyEffects[i]);
         }
     }
 }

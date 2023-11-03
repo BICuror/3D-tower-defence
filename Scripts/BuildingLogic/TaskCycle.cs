@@ -29,7 +29,7 @@ public class TaskCycle : MonoBehaviour
 
     private void Awake() => _rechargeInstruction = new WaitForSeconds(_rechargeTime);
 
-    public void StartSycle() => Recharge();
+    public void StartCycle() => Recharge();
     
     private void Recharge()
     {
@@ -41,7 +41,7 @@ public class TaskCycle : MonoBehaviour
         }
     }
     
-    protected virtual bool CanWork() => true;
+    public virtual bool CanWork() => true;
 
     private IEnumerator StartRechargeProcess()
     {

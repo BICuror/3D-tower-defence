@@ -2,75 +2,68 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
-public enum OffMeshLinkMoveMethod
-{
-    Teleport,
-    NormalSpeed,
-    Parabola,
-    Curve
-}
-
 [RequireComponent(typeof(NavMeshAgent))]
 
-public class AgentLinkMover : MonoBehaviour
+public sealed class AgentLinkMover : MonoBehaviour
 {
-    [SerializeField] private OffMeshLinkMoveMethod m_Method = OffMeshLinkMoveMethod.Parabola;
-    [SerializeField] private AnimationCurve m_Curve = new AnimationCurve();
+    [SerializeField] private float _jumpHeightInBlocks; 
+    [SerializeField] private AnimationCurve _animationCurve;
+    
+    [SerializeField] private float _linkTravelDuration = 1f;
 
-    private NavMeshAgent agent;
-
-    private float _linkDuration = 1f;
-
+    private NavMeshAgent _agent;
+    private bool _isOnNavMeshLink;
     private YieldInstruction _yieldInstruction = new WaitForFixedUpdate();
 
-    private void Awake() => agent = GetComponent<NavMeshAgent>();
+    private void Awake() => _agent = GetComponent<NavMeshAgent>();
+    private void OnEnable() 
+    {
+        if (_isOnNavMeshLink)
+        {    
+            _isOnNavMeshLink = false;
+        }
+    }
+
     private void Update()
     {
-        if (agent.isOnOffMeshLink)
+        if (_agent.isOnOffMeshLink)
         {
-            StartCoroutine(Parabola(agent, 2.0f, 0.5f));
-            agent.CompleteOffMeshLink();
+            if (_isOnNavMeshLink == false)
+            {
+                _isOnNavMeshLink = true;
+                StartCoroutine(TravelByParabola());
+            }
         }
     }
 
-    private IEnumerator NormalSpeed(NavMeshAgent agent)
+    private IEnumerator TravelByParabola()
     {
-        OffMeshLinkData data = agent.currentOffMeshLinkData;
-        Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
-        while (agent.transform.position != endPos)
-        {
-            agent.transform.position = Vector3.MoveTowards(agent.transform.position, endPos, agent.speed * Time.deltaTime);
-            yield return _yieldInstruction;
-        }
-    }
+        OffMeshLinkData currentData = _agent.currentOffMeshLinkData;
 
-    private IEnumerator Parabola(NavMeshAgent agent, float height, float duration)
-    {
-        OffMeshLinkData data = agent.currentOffMeshLinkData;
-        Vector3 startPos = agent.transform.position;
-        Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
-        float normalizedTime = 0.0f;
-        while (normalizedTime < _linkDuration)
-        {
-            float yOffset = height * 4.0f * (normalizedTime - normalizedTime * normalizedTime);
-            agent.transform.position = Vector3.Lerp(startPos, endPos, normalizedTime) + yOffset * Vector3.up;
-            normalizedTime += Time.deltaTime / duration;
-            yield return _yieldInstruction;
-        }
-    }
+        float duration = _linkTravelDuration * (1f / _agent.speed);
 
-    private IEnumerator Curve(NavMeshAgent agent, float duration)
-    {
-        OffMeshLinkData data = agent.currentOffMeshLinkData;
-        Vector3 startPos = agent.transform.position;
-        Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
-        float normalizedTime = 0.0f;
-        while (normalizedTime < _linkDuration)
+        Vector3 startPos = _agent.transform.position;
+        Vector3 endPos = currentData.endPos + Vector3.up * _agent.baseOffset;
+
+        float passedTime = 0f;
+
+        while (passedTime < duration)
         {
-            float yOffset = m_Curve.Evaluate(normalizedTime);
-            agent.transform.position = Vector3.Lerp(startPos, endPos, normalizedTime) + yOffset * Vector3.up;
-            normalizedTime += Time.deltaTime / (duration * 4);
+            float evaluatedTime = passedTime / duration;
+
+            float yOffset = _jumpHeightInBlocks * _animationCurve.Evaluate(evaluatedTime);
+            
+            _agent.transform.position = Vector3.Lerp(startPos, endPos, evaluatedTime) + yOffset * Vector3.up;
+            
+            passedTime += Time.deltaTime;
+            
             yield return _yieldInstruction;
         }
+        
+        _isOnNavMeshLink = false;
+
+        transform.position = endPos;
+
+        _agent.CompleteOffMeshLink();
     }
 }

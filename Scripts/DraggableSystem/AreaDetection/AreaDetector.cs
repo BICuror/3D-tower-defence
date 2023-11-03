@@ -2,22 +2,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public abstract class AreaDetector <T> : MonoBehaviour
+public abstract class AreaDetector <T> : MonoBehaviour where T: MonoBehaviour 
 {
     protected List<T> _list = new List<T>();
 
-    public UnityEvent<T> AddedEntity;
-    public UnityEvent<T> RemovedEntity;
-
-    public UnityEvent<GameObject> AddedGameObject;
-    public UnityEvent<GameObject> RemovedGameObject;
+    public UnityEvent<T> AddedComponent;
+    public UnityEvent<T> RemovedComponent;
     
     public bool IsEmpty() => _list.Count == 0;
-
     public T GetRandomEntity() => _list[Random.Range(0, _list.Count)];
-
     public T GetFirstEntity() => _list[0];
-    
     public IReadOnlyList<T> GetList() => _list;
 
     public void ClearList() => _list = new List<T>();
@@ -26,23 +20,44 @@ public abstract class AreaDetector <T> : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent(out T component))
         {
-            _list.Add(component);
-
-            AddedEntity.Invoke(component);
-
-            AddedGameObject.Invoke(gameObject);
+            AddComponent(component);
         }
+    }
+
+    protected void AddComponent(T component)
+    {
+        _list.Add(component);
+
+        AddedComponent.Invoke(component);
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.TryGetComponent(out T component))
         {
-            _list.Remove(component);
+            RemoveComponent(component);
+        }
+    }
 
-            RemovedEntity.Invoke(component);
+    protected void RemoveComponent(T component)
+    {
+        _list.Remove(component);
 
-            RemovedGameObject.Invoke(other.gameObject);
+        RemovedComponent.Invoke(component);
+    }
+
+    private void OnDestroy()
+    {
+        while(_list.Count > 0)
+        {
+            if (_list[_list.Count - 1] != null)
+            {
+                RemoveComponent(_list[_list.Count - 1]);
+            }
+            else 
+            {
+                _list.RemoveAt(_list.Count - 1);
+            }
         }
     }
 }

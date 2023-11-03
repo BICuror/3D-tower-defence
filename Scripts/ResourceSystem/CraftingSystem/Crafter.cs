@@ -52,7 +52,7 @@ public sealed class Crafter : MonoBehaviour
     
     private void CreateCraftResult()
     {
-        DraggableCreator.Instance.CreateDraggable(_currentCraft.ResultPrefab, transform.position, _presentationObject.transform.position);
+        DraggableCreator.Instance.CreateDraggableOnPosition(_currentCraft.ResultPrefab, transform.position, _presentationObject.transform.position);
 
         _currentCraft = null;
         
@@ -63,14 +63,14 @@ public sealed class Crafter : MonoBehaviour
 
     private void CollectResources()
     {
-        List<Resource> resourcesInArea = new List<Resource>(_resourceAreaDetector.GetList());
+        List<Resource> resourcesInArea = new List<Resource>(_resourceAreaDetector.GetPlacedComponentsList());
 
         _resourceCollector.CollectResources(resourcesInArea);
 
         _resourceAreaDetector.ClearList();
-    }
 
-    
+        _resourceAreaDetector.ClearPlacedList();
+    }
 
     public void TryToCraft()
     {
@@ -92,7 +92,7 @@ public sealed class Crafter : MonoBehaviour
 
     private Dictionary<ResourceData, int> GetResourcesInArea()
     {
-        IReadOnlyList<Resource> resourcesInArea = _resourceAreaDetector.GetList();
+        IReadOnlyList<Resource> resourcesInArea = _resourceAreaDetector.GetPlacedComponentsList();
     
         Dictionary<ResourceData, int> resources = new Dictionary<ResourceData, int>();
 

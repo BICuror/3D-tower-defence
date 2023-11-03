@@ -5,11 +5,19 @@ using UnityEngine.VFX;
 
 public sealed class ParticleEffectManager : MonoBehaviour
 {
-    [SerializeField] private EntityEffectManager _entityEffectManager;
+    private EntityEffectManager _entityEffectManager;
 
     private Dictionary<Effect, VisualEffectPoolObjectHandler> _appliedEffects = new Dictionary<Effect, VisualEffectPoolObjectHandler>();
 
-    public void ApplyEffect(Effect effect)
+    private void Awake()
+    {
+        _entityEffectManager = GetComponent<EntityEffectManager>();
+    
+        _entityEffectManager.EffectApplied.AddListener(ApplyEffect);
+        _entityEffectManager.EffectRemoved.AddListener(RemoveEffect);
+    }
+
+    private void ApplyEffect(Effect effect)
     {
         if (_appliedEffects.ContainsKey(effect) == false)
         {        
@@ -19,23 +27,28 @@ public sealed class ParticleEffectManager : MonoBehaviour
 
             visualEffect.transform.SetParent(transform);
 
-            visualEffect.transform.localPosition = Vector3.zero;
+            visualEffect.transform.localPosition = new Vector3(0f, effect.InstantiationHeight, 0f);
 
             visualEffect.transform.localRotation = Quaternion.identity;
+
+            visualEffect.transform.localScale = Vector3.one;
         }
     }
 
-    public void RemoveEffect(Effect effect)
+    private void RemoveEffect(Effect effect)
     {
         if (_entityEffectManager.HasEffect(effect) == false)
-        {
-            VisualEffectPoolObjectHandler visualEffect = _appliedEffects[effect];
+        {   
+            if (_appliedEffects.ContainsKey(effect))
+            {
+                VisualEffectPoolObjectHandler visualEffect = _appliedEffects[effect];
 
-            _appliedEffects.Remove(effect);
+                _appliedEffects.Remove(effect);
 
-            visualEffect.transform.SetParent(null);
+                visualEffect.transform.SetParent(null);
 
-            visualEffect.Stop();
+                visualEffect.Stop();
+            }
         }
     }
 }

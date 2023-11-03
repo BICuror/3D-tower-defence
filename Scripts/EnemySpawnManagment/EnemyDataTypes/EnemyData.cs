@@ -17,5 +17,6 @@ public sealed class EnemyData : ScriptableObject
     [SerializeField] private Material _material;
     public Material GetMaterial() => _material;
 
-    //[SerializeField] private Animato    
+    [SerializeField] private SpecialEnemyObject _specialObject;
+    public SpecialEnemyObject GetSpecialObject() => _specialObject;
 }

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c8c4f13261f80a4aaaf6793ac8194a1, type: 3}
   m_Name: OnFireEffect
   m_EditorClassIdentifier: 
-  _uIMaterial: {fileID: 2100000, guid: 3f45b0c3ee8267b40bf47c062188ce9a, type: 2}
   _effectPrefab: {fileID: 4731769080734274121, guid: 5daf3f5d70621654eb6765544887564a, type: 3}
+  _instantiationHeight: 0
   _initialEffectPoolSize: 10
-  _tickDuration: 0.1
-  _ticksAmount: 113
-  _damage: 0.25
+  _tickDuration: 0.5
+  _ticksAmount: 3
+  _damage: 2

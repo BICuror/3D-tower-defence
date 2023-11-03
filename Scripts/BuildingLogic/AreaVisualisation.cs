@@ -6,7 +6,7 @@ public sealed class AreaVisualisation : MonoBehaviour
     [Header("VisualisationSettings")]
     [SerializeField] private int _visualisationFrameDuration;
 
-    [Range(0f, 2f)] [SerializeField] private float _visualisationSpeed;
+    [SerializeField] private AnimationCurve _appearSpeedCurve;
 
     [SerializeField] private GameObject _reachAreaVisualisation;
 
@@ -26,11 +26,11 @@ public sealed class AreaVisualisation : MonoBehaviour
     {
         YieldInstruction instruction = new WaitForFixedUpdate();
 
-        for (float i = 0; i < _visualisationFrameDuration; i++)
+        for (float i = 0; i <= _visualisationFrameDuration; i++)
         {
             yield return instruction;
 
-            float scale = Mathf.Lerp(_reachAreaVisualisation.transform.localScale.x, finalScale.x, i / (float)(_visualisationFrameDuration)) * _visualisationSpeed;
+            float scale = Mathf.Lerp(0f, finalScale.x, _appearSpeedCurve.Evaluate(i / (float)(_visualisationFrameDuration)));
 
             _reachAreaVisualisation.transform.localScale = new Vector3(scale, finalScale.y, scale);
         }  
@@ -50,11 +50,11 @@ public sealed class AreaVisualisation : MonoBehaviour
     {
         YieldInstruction instruction = new WaitForFixedUpdate();
 
-        for (float i = 0; i < _visualisationFrameDuration; i++)
+        for (float i = 0; i <= _visualisationFrameDuration; i++)
         {
             yield return instruction;
 
-            float scale = Mathf.Lerp(_reachAreaVisualisation.transform.localScale.x, 0, i / (float)(_visualisationFrameDuration) * _visualisationSpeed);
+            float scale = Mathf.Lerp(initialScale.x, 0, _appearSpeedCurve.Evaluate(i / (float)(_visualisationFrameDuration)));
 
             _reachAreaVisualisation.transform.localScale = new Vector3(scale, initialScale.y, scale);
         }

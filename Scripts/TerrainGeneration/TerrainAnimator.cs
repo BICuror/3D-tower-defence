@@ -9,30 +9,35 @@ public sealed class TerrainAnimator : MonoBehaviour
     [SerializeField] private Material _baseMaterial;
 
     [SerializeField] private Material _transitionMaterial;
-
-    private Material _currentTransitionMaterial;
+    public Material TransitionMaterial => _transitionMaterial;
 
     private MeshRenderer _meshRenderer;
 
+    public UnityEvent AnitmationStarted;
+
+    public UnityEvent AnimationEnded;
+
     private void Awake()
     {
+        _transitionMaterial = new Material(_transitionMaterial);
+    
         _meshRenderer = GetComponent<MeshRenderer>();
-
-        _currentTransitionMaterial = new Material(_transitionMaterial);
     }
 
     public void SetCenter(Vector3 position)
     {
-        _currentTransitionMaterial.SetVector("Center", position);
+        _transitionMaterial.SetVector("Center", position);
     }
 
     public void StartDisappearing(float duration)
     {
         StopAllCoroutines();
 
+        _meshRenderer.sharedMaterial = _transitionMaterial;
+
         StartCoroutine(Disappear(duration));
-        
-        _meshRenderer.material = _currentTransitionMaterial;
+
+        AnitmationStarted.Invoke();
     }
 
     private IEnumerator Disappear(float duration)
@@ -43,27 +48,25 @@ public sealed class TerrainAnimator : MonoBehaviour
 
         while (duration >= elapsedTime)
         {
-            yield return instruction;
-
             elapsedTime += Time.deltaTime;
 
             float evaluatedValue = elapsedTime / duration;
 
             float currentRadius = Mathf.Lerp(_radius, 0f, evaluatedValue);
 
-            _currentTransitionMaterial.SetFloat("Distance", currentRadius);
+            _transitionMaterial.SetFloat("Distance", currentRadius);
+            
+            yield return instruction;
         }
-
-        _meshRenderer.material = _baseMaterial;
     }
 
     public void StartAppearing(float duration)
     {
         StopAllCoroutines();
 
+        _meshRenderer.sharedMaterial = _transitionMaterial;
+
         StartCoroutine(Appear(duration));
-        
-        _meshRenderer.material = _currentTransitionMaterial;
     }
 
     private IEnumerator Appear(float duration)
@@ -74,17 +77,19 @@ public sealed class TerrainAnimator : MonoBehaviour
 
         while (duration >= elapsedTime)
         {
-            yield return instruction;
-
             elapsedTime += Time.deltaTime;
 
             float evaluatedValue = elapsedTime / duration;
 
             float currentRadius = Mathf.Lerp(0f, _radius, evaluatedValue);
 
-            _currentTransitionMaterial.SetFloat("Distance", currentRadius);
+            _transitionMaterial.SetFloat("Distance", currentRadius);
+            
+            yield return instruction;
         }
-
-        _meshRenderer.material = _baseMaterial;
+        
+        _meshRenderer.sharedMaterial = _baseMaterial;
+        
+        AnimationEnded.Invoke();
     }    
 }

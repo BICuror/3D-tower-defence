@@ -52,19 +52,28 @@ VisualEffect:
   m_PropertySheet:
     m_Float:
       m_Array:
-      - m_Value: 1.4
+      - m_Value: 1
         m_Name: MaxLifeTime
         m_Overridden: 1
       - m_Value: 2
         m_Name: MaxLiffeTime
         m_Overridden: 1
+      - m_Value: 0.28
+        m_Name: SlideSize
+        m_Overridden: 1
+      - m_Value: 0.18
+        m_Name: SlideAplha
+        m_Overridden: 1
     m_Vector2f:
       m_Array: []
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 4, y: 15.72, z: 0}
+        m_Name: SlideScale
+        m_Overridden: 1
     m_Vector4f:
       m_Array:
-      - m_Value: {x: 0, y: 1.1042991, z: 2.9960783, w: 1}
+      - m_Value: {x: 0, y: 2.9170952, z: 3.698113, w: 1}
         m_Name: Color
         m_Overridden: 1
     m_Uint:
@@ -79,8 +88,11 @@ VisualEffect:
       m_Array: []
     m_NamedObject:
       m_Array:
-      - m_Value: {fileID: 2800000, guid: 5346e158ec9ab1a4cb2f3a3fb9f3a8f8, type: 3}
+      - m_Value: {fileID: 2800000, guid: ef96dce8c737a034f8c7a1d878e689a4, type: 3}
         m_Name: Texture
+        m_Overridden: 1
+      - m_Value: {fileID: 2800000, guid: c06c00f2567bcb940bbf68e3f823e20e, type: 3}
+        m_Name: SllideTexutre
         m_Overridden: 1
     m_Bool:
       m_Array: []
@@ -136,4 +148,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19786b6f7864c89478ed8f02778682bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stopAction: 1
   _visualEffect: {fileID: 8355824269385458535}

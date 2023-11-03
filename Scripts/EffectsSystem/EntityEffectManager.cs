@@ -6,6 +6,7 @@ using UnityEngine.AI;
 
 public class EntityEffectManager : MonoBehaviour
 {
+    protected bool _effectsCanBeSet = true;
     private EntityComponentsContainer _entityComponentsContainer;
 
     private List<Effect> _appliedEffects;
@@ -14,12 +15,16 @@ public class EntityEffectManager : MonoBehaviour
 
     public UnityEvent<Effect> EffectRemoved;
     
+    private Dictionary<Effect, Coroutine> _coroutines = new Dictionary<Effect, Coroutine>();
+
     public List<Effect> GetAllEffecs() => _appliedEffects;
 
     public bool HasEffect(Effect effect) => _appliedEffects.Contains(effect);
 
     private void Start()
     {
+        GetComponent<EntityHealth>().DeathEvent.AddListener(RemoveAllEffects);
+
         _appliedEffects = new List<Effect>();
 
         NavMeshAgent agent = GetComponent<NavMeshAgent>();
@@ -31,7 +36,7 @@ public class EntityEffectManager : MonoBehaviour
     
     public void ApplyEffect(Effect effectToApply)
     {
-        if (effectToApply.CanBeApplied(_entityComponentsContainer))
+        if (_effectsCanBeSet && effectToApply.CanBeApplied(_entityComponentsContainer) && gameObject.activeSelf)
         {
             _appliedEffects.Add(effectToApply);
 
@@ -47,34 +52,40 @@ public class EntityEffectManager : MonoBehaviour
         }
     }
 
+    public void RemoveAllEffects(GameObject blank) => RemoveAllEffects();
     public void RemoveAllEffects()
     {
-        for (int i = 0; i < _appliedEffects.Count; i++)
-        {
-            Effect effectToRemove = _appliedEffects[i];
+        StopAllCoroutines();
 
-            _appliedEffects.Remove(effectToRemove);
-
-            EffectRemoved?.Invoke(effectToRemove);
-
-            effectToRemove.RemoveFromEntity(_entityComponentsContainer);
-        }
+        while(_appliedEffects.Count > 0)
+        {   
+            RemoveEffect(_appliedEffects[_appliedEffects.Count - 1]);
+        }   
     }
     
     public void RemoveEffect(Effect effectToRemove)
     {
-        if (HasEffect(effectToRemove))
+        _appliedEffects.Remove(effectToRemove);
+
+        EffectRemoved?.Invoke(effectToRemove);
+
+        if (_coroutines.ContainsKey(effectToRemove)) 
         {
-            _appliedEffects.Remove(effectToRemove);
+            StopCoroutine(_coroutines[effectToRemove]);
 
-            EffectRemoved?.Invoke(effectToRemove);
-
-            effectToRemove.RemoveFromEntity(_entityComponentsContainer);
+            _coroutines.Remove(effectToRemove);
         }
+
+        effectToRemove.RemoveFromEntity(_entityComponentsContainer);
     }
 
     #region EffectOverTicks
-    public void ApplyEffectOverTicks(RemoveOverTicksEffect effect) => StartCoroutine(ApplyEffectOverTime(effect));   
+    public void ApplyEffectOverTicks(RemoveOverTicksEffect effect)
+    {
+        CheckToRemoveCoroutine(effect);
+
+        _coroutines.Add(effect, StartCoroutine(ApplyEffectOverTime(effect)));   
+    }
 
     private IEnumerator ApplyEffectOverTime(RemoveOverTicksEffect effect)
     {
@@ -94,7 +105,12 @@ public class EntityEffectManager : MonoBehaviour
     #endregion
     
     #region PermanentEffectOverTime
-    public void ApplyEffectOverTimePermanently(PermanentOverTimeEffect effect) => StartCoroutine(PermemantlyApplyEffectOverTime(effect));   
+    public void ApplyEffectOverTimePermanently(PermanentOverTimeEffect effect)
+    {
+        CheckToRemoveCoroutine(effect);
+        
+        _coroutines.Add(effect, StartCoroutine(PermemantlyApplyEffectOverTime(effect)));   
+    }
 
     private IEnumerator PermemantlyApplyEffectOverTime(PermanentOverTimeEffect effect)
     {
@@ -112,7 +128,12 @@ public class EntityEffectManager : MonoBehaviour
     #endregion
 
     #region ApplyAndRemoveOverTime
-    public void ApplyEffectAndRemoveAfterTime(RemoveOverTimeEffect effect) => StartCoroutine(ApplyAndRemove(effect));    
+    public void ApplyEffectAndRemoveAfterTime(RemoveOverTimeEffect effect)
+    {
+        CheckToRemoveCoroutine(effect);
+
+        _coroutines.Add(effect, StartCoroutine(ApplyAndRemove(effect)));   
+    }
 
     private IEnumerator ApplyAndRemove(RemoveOverTimeEffect effect)
     {
@@ -130,4 +151,15 @@ public class EntityEffectManager : MonoBehaviour
         effect.ApplyToEntity(_entityComponentsContainer);
     }
     #endregion
+
+    private void CheckToRemoveCoroutine(Effect effect)
+    {
+        if (_coroutines.ContainsKey(effect))
+        {
+            if (_coroutines[effect] != null) StopCoroutine(_coroutines[effect]);  
+            _coroutines.Remove(effect);  
+            _appliedEffects.Remove(effect);
+            effect.RemoveFromEntity(_entityComponentsContainer);
+        }
+    }
 }

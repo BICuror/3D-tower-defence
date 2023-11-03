@@ -27,8 +27,8 @@ Transform:
   m_GameObject: {fileID: 1434035593955825600}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.75, y: 1, z: 0.75}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalScale: {x: 0.3, y: 0.6, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2945935703963253291}
@@ -40,7 +40,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1434035593955825600}
-  m_Mesh: {fileID: -2432090755550338912, guid: cbed1e88b42d5684294b16543a9ccc92, type: 3}
+  m_Mesh: {fileID: 4300000, guid: abde8af5c266e5f4785ef8779296e3cd, type: 3}
 --- !u!23 &562744233952541155
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -97,6 +97,7 @@ GameObject:
   - component: {fileID: 6930342307735015185}
   - component: {fileID: 8017433243824409258}
   - component: {fileID: 7105828444567967235}
+  - component: {fileID: 2696211949171836501}
   m_Layer: 12
   m_Name: Item
   m_TagString: Draggable
@@ -113,7 +114,7 @@ Transform:
   m_GameObject: {fileID: 5698165792825214021}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18, y: 4, z: 7}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -243,5 +244,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _itemMesh: {fileID: 1434035593955825600}
-  _maxAdditionalYRotation: 0
-  _maxPositionFromCenter: 0
+  _maxAdditionalYRotation: 360
+  _maxPositionFromCenter: 0.05
+--- !u!114 &2696211949171836501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5698165792825214021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 915917543c8d1e6409822b9113d70d91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _meshes:
+  - {fileID: 4300000, guid: c40520cbfda3db142b5383f2e3ccd1b4, type: 3}
+  - {fileID: 4300000, guid: 2ae9e3c928fa79a41b8bab6982c83a76, type: 3}
+  - {fileID: 4300000, guid: abde8af5c266e5f4785ef8779296e3cd, type: 3}
+  - {fileID: 4300000, guid: 64c5d368f7634f340994131062f4983a, type: 3}
+  - {fileID: 4300000, guid: 93da6ba7e4752b54a816402d9b1903f9, type: 3}
+  - {fileID: 4300000, guid: f66f3e258bebb1c45a7c33f8d10e0343, type: 3}
+  _meshFilter: {fileID: 7615943925459853447}

@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VFX;
+using System.Collections;
 
-public class VisualEffectPoolObjectHandler : MonoBehaviour
+public sealed class VisualEffectPoolObjectHandler : MonoBehaviour
 {
     [SerializeField] private StopActionType _stopAction;
 
@@ -27,22 +26,22 @@ public class VisualEffectPoolObjectHandler : MonoBehaviour
     {
         _visualEffect.Stop();
 
-        ExecuteStopAction();
+        StartCoroutine(StartDisableingProcess());
     }
 
     private IEnumerator StartDisableingProcess()
     {
         yield return _rechargeInstruction;
 
-        gameObject.SetActive(false);
+        ExecuteStopAction();
     }
 
     private void ExecuteStopAction()
     {
         switch (_stopAction)
         {
-            case StopActionType.Destroy: Destroy(gameObject, _visualEffect.GetFloat("MaxLifeTime")); break;
-            case StopActionType.Disable: StartCoroutine(StartDisableingProcess()); break;
+            case StopActionType.Destroy: Destroy(gameObject); break;
+            case StopActionType.Disable: gameObject.SetActive(false); break;
         }
     }
 

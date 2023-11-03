@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public sealed class Launcher : MonoBehaviour
 {
-    public UnityEvent Landed;
+    public UnityEvent<DraggableObject> Landed;
 
     private DraggableObject _draggablePrefab;
     public void SetDraggablePrefab(DraggableObject draggable) => _draggablePrefab = draggable;
@@ -16,6 +16,6 @@ public sealed class Launcher : MonoBehaviour
 
         draggable.Place();
 
-        Landed.Invoke();
+        Landed.Invoke(draggable);
     }
 }

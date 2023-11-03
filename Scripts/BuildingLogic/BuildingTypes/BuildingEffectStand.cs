@@ -3,46 +3,29 @@ using UnityEngine;
 
 public sealed class BuildingEffectStand : MonoBehaviour
 {
-    [SerializeField] private BuildingsAreaScaner _buildingAreaScaner;
+    [SerializeField] private DraggableEffectManagerAreaDetector _draggableEffectManagerAreaDetector;
 
     [SerializeField] private Effect[] _applyEffects;
 
-    private void Start()
+    private void Awake()
+    {
+        _draggableEffectManagerAreaDetector.PlacedComponentAdded.AddListener(AddEffectToContainer);
+        _draggableEffectManagerAreaDetector.PlacedComponentRemoved.AddListener(RemoveEffectFromContainer);
+    }
+
+    private void AddEffectToContainer(EntityEffectManager draggable)
     {
         for (int i = 0; i < _applyEffects.Length; i++)
         {
-            _applyEffects[i].TryInstaitiateVisualEffectsPool();
+            draggable.ApplyEffect(_applyEffects[i]);
         }
-
-        _buildingAreaScaner.ErectedBuildingAdded.AddListener(TryAddEffectToContainer);
-        _buildingAreaScaner.ErectedBuildingRemoved.AddListener(TryRemoveEffectFromContainer);
     }
 
-    private void TryAddEffectToContainer(Building building)
+    private void RemoveEffectFromContainer(EntityEffectManager draggable)
     {
         for (int i = 0; i < _applyEffects.Length; i++)
         {
-            building.gameObject.GetComponent<EntityEffectManager>().ApplyEffect(_applyEffects[i]);
-        }
-    }
-
-    private void TryRemoveEffectFromContainer(Building building)
-    {
-        for (int i = 0; i < _applyEffects.Length; i++)
-        {
-            building.gameObject.GetComponent<EntityEffectManager>().RemoveEffect(_applyEffects[i]);
-        }
-    }
-    
-    private void OnDestroy() => RemoveAllEffects();
-
-    public void RemoveAllEffects()
-    {
-        List<Building> building = _buildingAreaScaner.GetErectedBuildings();
-
-        for (int i = 0; i < building.Count; i++)
-        {
-            TryRemoveEffectFromContainer(building[i]);
+            draggable.RemoveEffect(_applyEffects[i]);
         }
     }
 }

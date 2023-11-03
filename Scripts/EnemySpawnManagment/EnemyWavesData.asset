@@ -13,24 +13,34 @@ MonoBehaviour:
   m_Name: EnemyWavesData
   m_EditorClassIdentifier: 
   _possibleGroups:
-  - {fileID: 11400000, guid: e080b1fb0cd02b14eb8b01921e7297ac, type: 2}
+  - {fileID: 11400000, guid: d91c68e7068550748b447441a44bb673, type: 2}
+  - {fileID: 11400000, guid: 311d18658fb3c214381cb7928ea676e7, type: 2}
+  - {fileID: 11400000, guid: ceb517bd796e81c42847c035cf543554, type: 2}
   _defaultEnemies:
   - _enemyData: {fileID: 11400000, guid: c1de2e8fa0e57cb4daf570d39ee50590, type: 2}
     _wheight: 0
-  - _enemyData: {fileID: 11400000, guid: d083d5000a95b9343b087e9fa8a37138, type: 2}
+  - _enemyData: {fileID: 11400000, guid: c1de2e8fa0e57cb4daf570d39ee50590, type: 2}
     _wheight: 6
   _tankEnemies:
-  - _enemyData: {fileID: 0}
+  - _enemyData: {fileID: 11400000, guid: d083d5000a95b9343b087e9fa8a37138, type: 2}
     _wheight: 0
+  - _enemyData: {fileID: 11400000, guid: d083d5000a95b9343b087e9fa8a37138, type: 2}
+    _wheight: 6
   _rangerEnemies:
-  - _enemyData: {fileID: 0}
+  - _enemyData: {fileID: 11400000, guid: 11aebb4dc0e7e1e419ffd3e1cd751748, type: 2}
+    _wheight: 0
+  - _enemyData: {fileID: 11400000, guid: 11aebb4dc0e7e1e419ffd3e1cd751748, type: 2}
     _wheight: 0
   _supportEnemies:
   - _enemyData: {fileID: 0}
     _wheight: 0
   _healerEnemies:
-  - _enemyData: {fileID: 0}
+  - _enemyData: {fileID: 11400000, guid: b790f7537f5e81947aad532a8b726f5a, type: 2}
     _wheight: 0
+  - _enemyData: {fileID: 11400000, guid: b790f7537f5e81947aad532a8b726f5a, type: 2}
+    _wheight: 6
   _quickieEnemies:
-  - _enemyData: {fileID: 0}
+  - _enemyData: {fileID: 11400000, guid: a291081f576523b40ab787e14ac2bd66, type: 2}
     _wheight: 0
+  - _enemyData: {fileID: 11400000, guid: a291081f576523b40ab787e14ac2bd66, type: 2}
+    _wheight: 6

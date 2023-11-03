@@ -1,0 +1,1 @@
+public sealed class TownhallCrystalDetector : AreaDetectorWithDraggableSubscription<TownhallCrystal> {}

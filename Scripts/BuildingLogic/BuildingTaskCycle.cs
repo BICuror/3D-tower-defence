@@ -10,8 +10,8 @@ public sealed class BuildingTaskCycle : TaskCycle
         
         _building.PickedUp.AddListener(StopCycle);
 
-        _building.BuildCompleted.AddListener(StartSycle);
+        _building.BuildCompleted.AddListener(StartCycle);
     }
 
-    protected override bool CanWork() => _building.IsBuilt(); 
+    public override bool CanWork() => _building.IsBuilt(); 
 }

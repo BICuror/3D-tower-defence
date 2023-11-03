@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6b47b59ada2ac848b46ba60f52ab866, type: 3}
   m_Name: PoisonEffect
   m_EditorClassIdentifier: 
-  _uIMaterial: {fileID: 2100000, guid: adc6d274b22b9ea469b21b5b7520eafa, type: 2}
+  _effectPrefab: {fileID: 6330811911315633617, guid: a31cdbe8aaad9e24db657750c66655b9, type: 3}
+  _instantiationHeight: 0
+  _initialEffectPoolSize: 3
   _tickDuration: 0.4
-  _damage: 1.4
+  _damage: 1.33

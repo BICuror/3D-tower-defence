@@ -3,32 +3,37 @@ using UnityEngine.Events;
 
 public class EnemyHealth : EntityHealth
 {
-    public UnityEvent<EnemyHealth> DeathEvent; 
+    public UnityEvent<EnemyHealth> EnemyDeathEvent; 
 
-    [SerializeField] private float _damageDecreaseSpeed = 0.1f;
+    private float _attackMultipluer;
 
     public void SetEnemyData(EnemyHealthData enemyData)
     {
         _maxHealth = enemyData.MaxHealth;
 
+        _incomingDamageMultipluer = enemyData.IncomingDamageMultipluer;
+
         HealFully();
     }
 
-    private void OnCollisionStay(Collision other) 
+    private void OnCollisionEnter(Collision other) 
     {
         if (other.gameObject.TryGetComponent(out BuildingHealth buildingHealth))
         {
-            GetHurt(_damageDecreaseSpeed);
-            buildingHealth.GetHurt(_damageDecreaseSpeed);
+            buildingHealth.GetHurt(GetCurrentHealth());
+
+            Die();
         }    
     }
 
+    private void OnDisable() => EnableHealthBar();
+
     public override void Die()
     {
+        DeathEvent.Invoke(gameObject);
+
+        EnemyDeathEvent.Invoke(this);
+
         gameObject.SetActive(false);
-
-        DestroyEvent?.Invoke(gameObject);
-
-        DeathEvent?.Invoke(this);
     }
 }

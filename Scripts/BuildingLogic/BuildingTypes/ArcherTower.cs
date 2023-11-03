@@ -2,48 +2,45 @@ using UnityEngine;
 
 public sealed class ArcherTower : MonoBehaviour
 {
-    [SerializeField] private Rigidbody _arrow;
-    
+    [Header("Stats")]
     [SerializeField] private float _arrowSpeed;
+    [SerializeField] private int _arrowDamage;
 
-    [SerializeField] private int _damage;
-
+    [Header("Links")]
+    [SerializeField] private Arrow _arrowPrefab;
     [SerializeField] private ApplyEffectContainer _applyEffectContainer;
-    
     [SerializeField] private EnemyAreaScaner _enemyAreaScaner;
+    [SerializeField] private Transform _shootingPoint;
+
+    private ObjectPool<Arrow> _arrowObjectPool; 
 
     private void Start()
     {   
+        _arrowObjectPool = new ObjectPool<Arrow>(_arrowPrefab, 3);
+
         TaskCycle buildingTaskCycle = GetComponent<TaskCycle>();
 
         buildingTaskCycle.ShouldWorkDelegate = ShouldWorkDelegate;
 
         buildingTaskCycle.TaskPerformed.AddListener(Shoot);
-
-        _applyEffectContainer.ApplyEffectUpdated.AddListener(ModifyArrow);
-
-        ModifyArrow();
-    }
-
-    private void ModifyArrow()
-    {
-        _arrow.GetComponent<Weapon>()._effect = _applyEffectContainer.GetApplyEffects();
-
-        _arrow.GetComponent<Weapon>().SetDamage(_damage);
     }
 
     private bool ShouldWorkDelegate() => _enemyAreaScaner.Empty() == false;
 
     private void Shoot()
     {   
-        _arrow.velocity = Vector3.zero;
+        Arrow currentArrow = _arrowObjectPool.GetNextPooledObject();
         
-        _arrow.gameObject.SetActive(true);
+        currentArrow.GetRigidbody().velocity = Vector3.zero;
+        currentArrow.transform.position = _shootingPoint.position;
+        
+        currentArrow.transform.LookAt(_enemyAreaScaner.GetFirstEnemy().transform.position);
+        
+        currentArrow.gameObject.SetActive(true);
 
-        _arrow.transform.position = transform.position;
+        currentArrow.SetEffects(_applyEffectContainer.GetApplyEffects());
+        currentArrow.SetContactDamage(_arrowDamage);
 
-        _arrow.transform.LookAt(_enemyAreaScaner.GetFirstEnemy().transform.position);
-
-        _arrow.AddForce(_arrow.transform.forward * _arrowSpeed, ForceMode.Impulse);
+        currentArrow.GetRigidbody().AddForce(currentArrow.transform.forward * _arrowSpeed, ForceMode.Impulse);
     }
 }

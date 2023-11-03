@@ -29,9 +29,9 @@ public sealed class OverheatingTower : MonoBehaviour
 
     private void ModifyArrow()
     {
-        _arrow.GetComponent<Weapon>()._effect = _applyEffectContainer.GetApplyEffects();
+       // _arrow.GetComponent<Weapon>()._effect = _applyEffectContainer.GetApplyEffects();
 
-        _arrow.GetComponent<Weapon>().SetDamage(_damage);
+        //_arrow.GetComponent<Weapon>().SetDamage(_damage);
     }
 
     public bool ShouldWorkDelegate() => _enemyAreaScaner.Empty() == false &&  _overheatingManager.IsOverheated() == false;

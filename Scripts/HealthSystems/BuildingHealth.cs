@@ -1,24 +1,45 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public sealed class BuildingHealth : EntityHealth
 {
+    public UnityEvent<BuildingHealth> BuildingDeathEvent;
+
     private void Start()
     {
-        HealthChanged.AddListener(CheckToHideHealthBar);
+        Healed.AddListener(CheckToHideHealthBar);
+        Damaged.AddListener(CheckToActivateHealthBar);
 
         _healthBar.gameObject.SetActive(false);
 
         Building building = GetComponent<Building>();
 
         building.PickedUp.AddListener(DisableHealthBar);
-        building.Placed.AddListener(CheckToHideHealthBar);
+        building.Placed.AddListener(CheckToActivateHealthBar);
+
+        building.PickedUp.AddListener(SetInvincible);
+        building.Placed.AddListener(SetVulnerable);
     }
+
+    public void SetInvincible() => SetInvincibleState(true);
+    public void SetVulnerable() => SetInvincibleState(false);
 
     private void CheckToHideHealthBar()
     {
-        float value = GetHealthPrcentage();
+        if (_healthBar.gameObject.activeSelf == true && GetHealthPrcentage() == 1f) DisableHealthBar();
+    }
 
-        if (value == 1 && _healthBar.gameObject.activeSelf == true) DisableHealthBar();
-        else if (_healthBar.gameObject.activeSelf == false && value != 1) EnableHealthBar();
+    private void CheckToActivateHealthBar()
+    {
+        if (_healthBar.gameObject.activeSelf == false && GetHealthPrcentage() < 1f) EnableHealthBar();
+    }
+
+    public override void Die()
+    {
+        DeathEvent.Invoke(gameObject);
+
+        BuildingDeathEvent.Invoke(this);
+        
+        Destroy(gameObject);
     }
 }

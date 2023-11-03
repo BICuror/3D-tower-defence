@@ -55,6 +55,9 @@ VisualEffect:
       - m_Value: 1.4
         m_Name: MaxLifeTime
         m_Overridden: 1
+      - m_Value: 1.5
+        m_Name: Height
+        m_Overridden: 1
     m_Vector2f:
       m_Array: []
     m_Vector3f:
@@ -133,4 +136,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19786b6f7864c89478ed8f02778682bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stopAction: 1
   _visualEffect: {fileID: 8984912996367535094}

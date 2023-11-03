@@ -1,8 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Zenject;
 
 public sealed class ResourceSourceGenerator : MonoBehaviour
 {       
+    [Inject] IslandData _islandData;
+
     [SerializeField] private LayerMask _takenLayers;
 
     [SerializeField] private LayerMask _terrainLayer; 
@@ -11,27 +14,23 @@ public sealed class ResourceSourceGenerator : MonoBehaviour
     {
         ResourceSourcesList.SetupList();        
 
-        IslandData islandData = IslandDataContainer.GetData();
-
-        for (int i = 0; i < islandData.Resources.Length; i++)
+        for (int i = 0; i < _islandData.Resources.Length; i++)
         {
-            for (int y = 0; y < islandData.Resources[i].SourcesAmount; y++)
+            for (int y = 0; y < _islandData.Resources[i].SourcesAmount; y++)
             {
-                TryGenerateResourceSource(islandData.Resources[i].SourcePrefab);
+                TryGenerateResourceSource(_islandData.Resources[i].SourcePrefab);
             }
         }
     }
 
     private void TryGenerateResourceSource(ResourceSource prefabToGenerate)
     {
-        IslandData islandData = IslandDataContainer.GetData();
-
         while (true)
         {
-            int x = Random.Range(0, islandData.IslandSize);
-            int z = Random.Range(0, islandData.IslandSize);
+            int x = Random.Range(0, _islandData.IslandSize);
+            int z = Random.Range(0, _islandData.IslandSize);
 
-            Ray heightRay = new Ray(new Vector3(x, islandData.IslandMaxHeight, z), Vector3.down);
+            Ray heightRay = new Ray(new Vector3(x, _islandData.IslandMaxHeight, z), Vector3.down);
 
             if (Physics.Raycast(heightRay, Mathf.Infinity, _takenLayers) == false)
             {
@@ -51,8 +50,8 @@ public sealed class ResourceSourceGenerator : MonoBehaviour
 
         ResourceSourcesList.Add(source.GetComponent<ResourceSource>());
 
-        source.GetComponent<ResourceSource>().Died.AddListener(ResourceSourcesList.Remove);
+        source.GetComponent<ResourceSource>().SourceDestroyed.AddListener(ResourceSourcesList.Remove);
 
-        source.GetComponent<ResourceSource>().Died.AddListener(TryGenerateResourceSource);
+        source.GetComponent<ResourceSource>().SourceDestroyed.AddListener(TryGenerateResourceSource);
     }
 }

@@ -3,15 +3,23 @@ using UnityEngine.AI;
 
 public sealed class EnemyDestanationSetter : MonoBehaviour
 {
+    private static EnemyDestanationSetter _instance;
+
+    public static EnemyDestanationSetter Instance => _instance;
+
+    private void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this;
+        }
+        else 
+        {
+            Debug.LogError("Multiple instances of EnemyDestantionSetter");
+        }
+    }
+
     [SerializeField] private Transform _townhall;
 
-    public void SetMapCenterPosition(Vector3 centerPosition)
-    {
-        
-    }
-
-    public void SetTargetToEnemy(GameObject enemy)
-    {
-        enemy.GetComponent<NavMeshAgent>().SetDestination(_townhall.position);
-    }
+    public Vector3 GetFinalEnemyDestanation() => _townhall.position;
 }

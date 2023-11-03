@@ -7,7 +7,16 @@ public sealed class AreaManager : MonoBehaviour
     [SerializeField] private int _radius;
     [SerializeField] private GameObject _reachAreaCollider;
 
-    private void Awake()
+    private void Awake() => UpdateScale();
+
+    public void SetRaduis(int value)
+    {
+        _radius = value;
+
+        UpdateScale();
+    }
+
+    public void UpdateScale()
     {
         _reachAreaCollider.transform.localScale = GetScale();
     }

@@ -4,5 +4,7 @@ public enum BlockType
     Surface,
     Rock,
     Road,
-    Corruption
+    RoadOnWater,
+    Corruption,
+    CorruptionOnWater
 }
