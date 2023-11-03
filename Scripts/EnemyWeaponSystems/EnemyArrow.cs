@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyArrow : EnemyWeapon
+public sealed class EnemyArrow : EnemyWeapon
 {
     [SerializeField] private VisualEffectHandler _visualEffectHandler;
 

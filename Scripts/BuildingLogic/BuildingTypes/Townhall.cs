@@ -7,32 +7,24 @@ using Zenject;
 
 public sealed class Townhall : MonoBehaviour
 {
-    [SerializeField] private TownhallCrystalDetector _townhallCrystalDetector;
- 
     [Inject] private IslandData _islandData;
-
     [Inject] private WaveManager _waveManager;
 
-    [Inject] private HeightMapGenerator _gen;
-
-    [Inject] private RoadMapGenerator _geeeen;
-
-    [SerializeField] private DraggableObject _crystalPrefab;
-
-    [SerializeField] private DraggableObject _chest;
-
+    [Header("Links")]
+    [SerializeField] private TownhallCrystalDetector _townhallCrystalDetector;
     [SerializeField] private Transform _creationSource;
 
-    [SerializeField] private LayerSetting _terrainSetting;
-
+    [Header("CrystalCreation")] 
+    [SerializeField] private DraggableObject _crystalPrefab;
     [SerializeField] private Launcher _crystalLauncher;
 
-    [SerializeField] private int amoun;
-
-    [SerializeField] private int _radius;
+    [Header("TowerCreation")]
+    [SerializeField] private DraggableObject _towerToCreate;
+    [SerializeField] private LayerSetting _terrainSetting;
+    [SerializeField] private int _towerAmount;
+    [SerializeField] private int _towerCreationRadius;
 
     public UnityEvent CrystalPlaced;
-
     public UnityEvent CrystalDestroyed;
 
     private void Awake()
@@ -42,7 +34,7 @@ public sealed class Townhall : MonoBehaviour
         _townhallCrystalDetector.PlacedComponentAdded.AddListener(DestroyCrystal);
 
         _waveManager.WavePreparationBegun.AddListener(CreateCrystal);
-        _waveManager.WavePreparationBegun.AddListener(Crts);
+        _waveManager.WavePreparationBegun.AddListener(CreateTowers);
         _waveManager.FirstWaveStarted.AddListener(CreateCrystal);
     }
     
@@ -71,41 +63,11 @@ public sealed class Townhall : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
-    public void Crts(float t)
+    public void CreateTowers(float blank)
     {
-        int center = (int)(_islandData.IslandSize / 2) + 1;
-
-        List<Vector3> pos = new List<Vector3>();
-
-        bool[,] roadMap = _geeeen.RoadMap;
-
-        int[,] heightMap = _gen.HeightMap;
-
-        for (int x = -_radius; x <= _radius; x++)
+        for (int i = 0; i < _towerAmount; i++)
         {
-            for (int z = -_radius; z <= _radius; z++)
-            {
-                int currentX = center + x;
-                int currentZ = center + z;
-
-                if (roadMap[currentX, currentZ])// && heightMap[currentX, currentZ] > 0)
-                {
-                    float height = heightMap[currentX, currentZ];
-
-                    if (height <= 0) height++;
-
-                    pos.Add(new Vector3(currentX, height + 1f, currentZ));
-                }
-            }
-        }
-
-        for (int i = 0; i < amoun; i++)
-        {
-            int index = Random.Range(0, pos.Count);
-
-            DraggableCreator.Instance.CreateDraggableOnRandomPosition(_chest, _creationSource.position, _radius, _terrainSetting);
-
-            pos.RemoveAt(index);
+            DraggableCreator.Instance.CreateDraggableOnRandomPosition(_towerToCreate, _creationSource.position, _towerCreationRadius, _terrainSetting);
         }
     }
 }

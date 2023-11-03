@@ -9,6 +9,6 @@ public sealed class EnemyBiomesGenerationInstaller : MonoInstaller
     public override void InstallBindings()
     {
         Container.Bind<EnemyBiomeContainer>().AsSingle().NonLazy();
-        Container.Bind<EnemyBiomeGenerator>().FromInstance(_enemyBiomeGenerator).AsSingle().NonLazy();
+        Container.Bind<EnemyBiomeMeshGenerator>().FromInstance(_enemyBiomeMeshGenerator).AsSingle().NonLazy();
     }
 }
