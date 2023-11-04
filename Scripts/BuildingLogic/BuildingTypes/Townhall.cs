@@ -34,8 +34,7 @@ public sealed class Townhall : MonoBehaviour
         _townhallCrystalDetector.PlacedComponentAdded.AddListener(DestroyCrystal);
 
         _waveManager.WavePreparationBegun.AddListener(CreateCrystal);
-        _waveManager.WavePreparationBegun.AddListener(CreateTowers);
-        _waveManager.FirstWaveStarted.AddListener(CreateCrystal);
+        //_waveManager.WavePreparationBegun.AddListener(CreateTowers);
     }
     
     public void SetPosition(Vector3 newPosition)

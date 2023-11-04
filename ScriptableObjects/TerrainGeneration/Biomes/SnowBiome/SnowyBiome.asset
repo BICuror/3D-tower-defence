@@ -15,12 +15,12 @@ MonoBehaviour:
   _eniviromentObject: {fileID: 6457869471833738900, guid: 9798b6e851461204788da6d39ad26980, type: 3}
   _eniviromentTexture: {fileID: 2800000, guid: 42478942f540a38429adacea8fd2ca50, type: 3}
   _buildingsTexture: {fileID: 2800000, guid: f06d05fc0be946d4399435f00f80051b, type: 3}
-  _roadType: 0
+  _roadType: 1
   _spawnerPositionValidator: {fileID: 11400000, guid: 17cc441cdf3207f4884e2a5ca7538876, type: 2}
   _roadBlock: {fileID: 11400000, guid: 4575c324f94f1b94081d04dd70db8603, type: 2}
   _roadBlockOnWater: {fileID: 11400000, guid: 18c1deecf11959849970502f93aefdaf, type: 2}
   _amountOfRoadNodesBetweenCenterAndEdge: 2
-  _islandSize: 25
+  _islandRadius: 12
   _islandMaxHeight: 40
   _islandHeightOffset: 5
   _biomes:
@@ -375,11 +375,6 @@ MonoBehaviour:
   _corruptionBlock: {fileID: 11400000, guid: af3e474824941524d84adbac46c8af6a, type: 2}
   _corruptionBlockOnWater: {fileID: 11400000, guid: a20e3ce4830c2344bb526b8310ff64c9, type: 2}
   _corruptionLessZeroHeight: 1
-  _resources:
-  - SourcePrefab: {fileID: 763919091716505602, guid: 94899794c7284bb4e8e70346bdf7218a, type: 3}
-    SourcesAmount: 3
-  - SourcePrefab: {fileID: 7957965917927938387, guid: a27e47095af9e7e47b149542f622a34d, type: 3}
-    SourcesAmount: 3
   _smoothingType: 1
   _smoothingStrength: 0.951
   _clearSingleEmptyBlocks: 1

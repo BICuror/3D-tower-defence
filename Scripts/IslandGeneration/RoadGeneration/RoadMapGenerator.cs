@@ -5,9 +5,7 @@ using Zenject;
 public sealed class RoadMapGenerator : MonoBehaviour
 {
     [Inject] private IslandData _islandData;
-
     [Inject] private EnemyBiomeContainer _enemyBiomeContainer;
-
     [Inject] private RoadNodeGenerator _roadNodeGenerator;
 
     private bool[,] _roadMap;

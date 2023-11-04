@@ -39,10 +39,10 @@ public sealed class IslandData : ScriptableObject
 
     [Header("GeneralIslandSettings")][Space] 
 
-    [SerializeField] private int _islandSize;
-    public int IslandSize {get => _islandSize;}
+    [SerializeField] private int _islandRadius;
+    public int IslandSize {get => _islandRadius * 2 + 1;}
 
-    public int MiddleIndex {get => _islandSize / 2;}
+    public int MiddleIndex {get => _islandRadius;}
 
     [SerializeField] private int _islandMaxHeight;
     public int IslandMaxHeight {get => _islandMaxHeight;}

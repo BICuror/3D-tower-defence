@@ -26,7 +26,6 @@ public sealed class EnemyBiome : MonoBehaviour
     private int _currentStage;
 
     public void SetSpawnerNodeIndex(Vector2Int spawnerNodeIndex) => _spawnerNodeIndex = spawnerNodeIndex;
-
     public void SetCenterPosition(Vector2Int position)
     {
         _centerPosition = position;
@@ -35,11 +34,12 @@ public sealed class EnemyBiome : MonoBehaviour
 
         AdjustPosition();
     }
-    
     public Vector2Int GetCenterPosition() => _centerPosition;
 
-    public void IncreaseCurrentStage() => _currentStage++;
+    public void DisableTerrain(float duration) => _terrainAnimator.StartDisappearing(duration);
+    public void EnableTerrain(float duration) => _terrainAnimator.StartAppearing(duration);
 
+    public void IncreaseCurrentStage() => _currentStage++;
     public int GetStage() => _currentStage;
 
     private void AdjustPosition()
@@ -53,16 +53,6 @@ public sealed class EnemyBiome : MonoBehaviour
         if (height == 0) height += 1f;
 
         _enemySpawner.transform.localPosition = new Vector3(radius, height + 1f, radius);
-    }
-
-    public void DisableTerrain(float duration)
-    {
-        _terrainAnimator.StartDisappearing(duration);
-    }
-
-    public void EnableTerrain(float duration)
-    {
-        _terrainAnimator.StartAppearing(duration);
     }
 
     public void RegenerateBiome()
@@ -98,6 +88,13 @@ public sealed class EnemyBiome : MonoBehaviour
         Mesh mesh = _terrainMeshGenerator.GetMesh();
 
         _terrainSetter.SetMesh(mesh);
+    }
+
+    public void Destroy()
+    {
+        _enemySpawner.DeactivateSpawner();
+
+        Destroy(gameObject);
     }
 
     private bool[,] GenerateEnemyMap()
@@ -167,12 +164,5 @@ public sealed class EnemyBiome : MonoBehaviour
         }
 
         return enemyBiomeGrid;
-    }
-
-    public void Destroy()
-    {
-        _enemySpawner.DeactivateSpawner();
-
-        Destroy(gameObject);
     }
 }

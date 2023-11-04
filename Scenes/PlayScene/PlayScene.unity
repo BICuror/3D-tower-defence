@@ -219,7 +219,6 @@ Transform:
   - {fileID: 1125240001}
   - {fileID: 910443200}
   - {fileID: 2099434305}
-  - {fileID: 65355287}
   - {fileID: 564568252}
   - {fileID: 20957094}
   - {fileID: 683996279}
@@ -315,50 +314,6 @@ Transform:
   - {fileID: 109203182}
   m_Father: {fileID: 532478018}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &65355286
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 65355287}
-  - component: {fileID: 65355288}
-  m_Layer: 0
-  m_Name: ResourceGenerator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &65355287
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 65355286}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.9968174, y: -21.71118, z: 50.876125}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 32533206}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &65355288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 65355286}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f0c7806ef9372443a96c7d45f229b5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &105885315
 GameObject:
   m_ObjectHideFlags: 0
@@ -1402,12 +1357,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc992927faeca9a48ba9e51c58b2e141, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _islandDecorationContainer: {fileID: 0}
   _navMeshSurface: {fileID: 683996285}
-  _navMeshLinksGenerator: {fileID: 683996284}
-  _roadMapGenerator: {fileID: 683996278}
   _roadTerrainSetter: {fileID: 1982758046}
-  _enemyBiomeGenerator: {fileID: 910443196}
 --- !u!114 &683996284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2643,17 +2594,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _waveEndingDuration: 2
   _wavePreparationDuration: 2
-  _roadTerrainAnimator: {fileID: 1982758052}
   WaveStopped:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1982758052}
+        m_TargetAssemblyTypeName: TerrainAnimator, Assembly-CSharp
+        m_MethodName: StartDisappearing
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   WavePreparationBegun:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1982758052}
+        m_TargetAssemblyTypeName: TerrainAnimator, Assembly-CSharp
+        m_MethodName: StartAppearing
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   WaveStarted:
-    m_PersistentCalls:
-      m_Calls: []
-  FirstWaveStarted:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &1125240001
@@ -3089,6 +3060,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _roadMapGenerator: {fileID: 683996278}
   _roadGenerator: {fileID: 683996283}
+  _navMeshLinksGenerator: {fileID: 683996284}
 --- !u!4 &1345661420
 Transform:
   m_ObjectHideFlags: 0

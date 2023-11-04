@@ -24,7 +24,7 @@ public sealed class EnemyBiomeGenerator : MonoBehaviour
 
     private void GenerateNewBiome()
     {
-        IReadOnlyList<Vector2Int> enemyBiomesIndexes = _enemyBiomeContainer.GetEnemyBiomesNodeIndexes();
+        List<Vector2Int> enemyBiomesIndexes = _enemyBiomeContainer.GetEnemyBiomesNodeIndexes();
 
         Vector2Int spawnerNodeIndex = _spawnerRoadNodeGenerator.GetRandomEnemySpawnerNodeIndex(enemyBiomesIndexes);
 

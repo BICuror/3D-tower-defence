@@ -7,24 +7,16 @@ using Zenject;
 public sealed class RoadGenerator : MonoBehaviour
 {
     [Inject] private IslandData _islandData;
-
     [Inject] private TextureManager _textureManager;
-
     [Inject] private HeightMapGenerator _heightMapGenerator;
-
-    [SerializeField] private DecorationContainer _islandDecorationContainer;
+    [Inject] private RoadMapGenerator _roadMapGenerator;
+    [Inject] private EnemyBiomeGenerator _enemyBiomeGenerator;
+    [Inject] private IslandDecorationContainer _islandDecorationContainer;
+    [Inject] private NavMeshLinksGenerator _navMeshLinksGenerator;
+    [Inject] private RoadNodeGenerator _nodeGenerator;
 
     [SerializeField] private NavMeshSurface _navMeshSurface;
-
-    [SerializeField] private NavMeshLinksGenerator _navMeshLinksGenerator;
-
-    [SerializeField] private RoadMapGenerator _roadMapGenerator;
-
-    [SerializeField] private RoadNodeGenerator _nodeGenerator;
-
     [SerializeField] private TerrainSetter _roadTerrainSetter;
-
-    [SerializeField] private EnemyBiomeGenerator _enemyBiomeGenerator;
 
     public void GenerateRoads()
     {

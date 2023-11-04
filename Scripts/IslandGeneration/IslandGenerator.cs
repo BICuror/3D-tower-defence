@@ -30,6 +30,8 @@ public sealed class IslandGenerator : MonoBehaviour
         ConvertHeightMapToBlockGrid();
 
         GenerateTerrainMesh();
+
+        SetupNodes();
             
         GenerateDecorations();
 
