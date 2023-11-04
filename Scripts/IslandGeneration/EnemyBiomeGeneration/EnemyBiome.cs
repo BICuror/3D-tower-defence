@@ -9,7 +9,10 @@ public sealed class EnemyBiome : MonoBehaviour
     [Inject] private EnemyBiomeMeshGenerator _terrainMeshGenerator;
     [Inject] private TextureManager _textureManager;
     [Inject] private IslandDecorationContainer _islandDecorationContainer;
-    [Inject] private IslandGenerator _islandGenerator;
+    [Inject] private IslandGridHolder _islandGridHolder;
+    [Inject] private EnemyBiomeMapGenerator _enemyBiomeMapGenerator;
+    [Inject] private EnemyBiomeMapToGridConverter _enemyBiomeMapToGridConverter;
+    [Inject] private OverlappingIslandDecorationsDisabler _overlappingIslandDecorationsDisabler;
 
     [SerializeField] private TerrainSetter _terrainSetter;
     [SerializeField] private EnemySpawner _enemySpawner;
@@ -35,6 +38,7 @@ public sealed class EnemyBiome : MonoBehaviour
         AdjustPosition();
     }
     public Vector2Int GetCenterPosition() => _centerPosition;
+    public Vector2Int GetBiomePosition() => new Vector2Int((int)transform.position.x, (int)transform.position.z);
 
     public void DisableTerrain(float duration) => _terrainAnimator.StartDisappearing(duration);
     public void EnableTerrain(float duration) => _terrainAnimator.StartAppearing(duration);
@@ -48,7 +52,7 @@ public sealed class EnemyBiome : MonoBehaviour
 
         transform.position = new Vector3(_centerPosition.x - radius, 0f, _centerPosition.y - radius);
 
-        float height = _islandGenerator.IslandGrid.GetMaxHeight(_centerPosition.x, _centerPosition.y);
+        float height = _islandGridHolder.Grid.GetMaxHeight(_centerPosition.x, _centerPosition.y);
 
         if (height == 0) height += 1f;
 
@@ -59,9 +63,11 @@ public sealed class EnemyBiome : MonoBehaviour
     {
         AdjustPosition();
 
-        bool[,] enemyBiomeMap = GenerateEnemyMap();
+        bool[,] enemyBiomeMap = _enemyBiomeMapGenerator.GenerateEnemyMap(GetStage());
 
-        BlockGrid blockGrid = ConvertEnemyMapToGrid(enemyBiomeMap);
+        BlockGrid blockGrid = _enemyBiomeMapToGridConverter.ConvertEnemyMapToGrid(enemyBiomeMap, GetStage(), GetBiomePosition());
+
+        _overlappingIslandDecorationsDisabler.DisableOverlappingIslandDecorations(enemyBiomeMap, GetStage(), GetBiomePosition());
 
         GenerateMesh(blockGrid);
 
@@ -95,74 +101,5 @@ public sealed class EnemyBiome : MonoBehaviour
         _enemySpawner.DeactivateSpawner();
 
         Destroy(gameObject);
-    }
-
-    private bool[,] GenerateEnemyMap()
-    {
-        int radius = _islandData.EnemyBiomeStages[_currentStage].EnemyBiomeRadius;
-
-        bool[,] enemyBiomeMap = new bool[radius * 2 + 1, radius * 2 + 1];
-
-        for (int x = 0; x < radius * 2 + 1; x++)
-        {
-            for (int y = 0; y < radius * 2 + 1; y++)
-            {
-                int distance = Mathf.Abs(radius + 1 - x) + Mathf.Abs(radius + 1 - y);
-
-                if (Random.Range(0f, 1f) > _islandData.EnemyBiomeStages[_currentStage].EnemyBiomeEdgeReductionCurve.Evaluate(Mathf.Lerp(0, 1, distance / radius)))
-                {
-                    enemyBiomeMap[x, y] = true;
-
-                    _islandDecorationContainer.SetActiveDecorationsIfInBound(_centerPosition.x - radius + x, _centerPosition.y - radius + y, false);
-                }
-            }
-        }
-
-        return enemyBiomeMap;
-    }
-
-    private BlockGrid ConvertEnemyMapToGrid(bool[,] enemyBiomeMap)
-    {
-        int radius = _islandData.EnemyBiomeStages[_currentStage].EnemyBiomeRadius;
-
-        BlockGrid enemyBiomeGrid = new BlockGrid(radius * 2 + 1, _islandData.IslandMaxHeight);
-
-        Vector2Int currentPos = new Vector2Int((int)(transform.position.x), (int)(transform.position.z));
-
-        bool[,] roadMap = _roadMapGenerator.RoadMap; 
-
-        for (int x = 0; x < radius * 2 + 1; x++)
-        {        
-            for (int z = 0; z < radius * 2 + 1; z++)
-            {   
-                if (enemyBiomeMap[x, z])
-                {   
-                    int height = 0;
-
-                    if (currentPos.x + x < _islandData.IslandSize && currentPos.y + z < _islandData.IslandSize && currentPos.x + x >= 0 && currentPos.y + z >= 0) 
-                    {
-                        if (roadMap[currentPos.x + x, currentPos.y + z] == true) continue;
-
-                        height = _islandGenerator.IslandGrid.GetMaxHeight(currentPos.x + x, currentPos.y + z);
-                    }
-
-                    BlockType blockType = BlockType.Corruption;
-
-                    if (height <= 0) 
-                    {
-                        height = _islandData.CorruptionLessZeroHeight;
-
-                        blockType = BlockType.CorruptionOnWater;
-                    }
-                    
-                    for (int y = height; y >= 0; y--)
-                    {
-                        enemyBiomeGrid.SetBlockType(new Vector3Int(x, y, z), blockType);  
-                    }    
-                }
-            }
-        }
-
-        return enemyBiomeGrid;
-    }
+    }   
 }

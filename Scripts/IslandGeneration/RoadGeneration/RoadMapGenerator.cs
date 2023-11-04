@@ -7,9 +7,9 @@ public sealed class RoadMapGenerator : MonoBehaviour
     [Inject] private IslandData _islandData;
     [Inject] private EnemyBiomeContainer _enemyBiomeContainer;
     [Inject] private RoadNodeGenerator _roadNodeGenerator;
+    [Inject] private RoadMapHolder _roadMapHolder;
 
     private bool[,] _roadMap;
-    public bool[,] RoadMap => _roadMap;
 
     private bool[,] _touchedNodesMap;
 
@@ -30,6 +30,8 @@ public sealed class RoadMapGenerator : MonoBehaviour
         }
 
         AddCenterRoad();
+
+        _roadMapHolder.SetRoadMap(_roadMap);
 
         return _roadMap;
     }

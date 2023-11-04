@@ -1,20 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
-public class BombCreatorTower : MonoBehaviour
+public sealed class BombCreatorTower : MonoBehaviour
 {
+    [Inject] private DraggableCreator _draggableCreator;
+
     [SerializeField] private Bomb _bombPrefab;
-
-    private Bomb _currentBomb;
-
-    private void Start()
-    {
-        GetComponent<DraggableObject>().Placed.AddListener(CreateBomb);        
-    }
 
     private void CreateBomb()
     {
-        DraggableCreator.Instance.CreateDraggableOnRandomPosition(_bombPrefab, transform.position);
+        _draggableCreator.CreateDraggableOnRandomPosition(_bombPrefab, transform.position);
     }
 }

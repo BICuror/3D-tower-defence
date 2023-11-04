@@ -5,9 +5,6 @@ using System.Runtime.InteropServices;
 
 public sealed class DraggableCreator : MonoBehaviour 
 {
-    private static DraggableCreator _instance;
-    public static DraggableCreator Instance => _instance;
-
     [Header("SpawnPositionSettings")]
     [SerializeField] private GameObject _blankDraggable;
 
@@ -24,21 +21,7 @@ public sealed class DraggableCreator : MonoBehaviour
     [SerializeField] private Launcher _defaultLauncherPrefab;
     
     private YieldInstruction _yieldInstruction = new WaitForFixedUpdate(); 
-
-    private void Awake()
-    {
-        if (_instance == null)
-        {
-            _instance = this;
-        }
-        else 
-        {
-            Debug.LogError($"Found other instance of {this.GetType().ToString()}");
-
-            Destroy(gameObject);
-        }
-    }
-
+    
     public void CreateDraggableOnPosition(DraggableObject draggablePrefab, Vector3 centerPosition, Vector3 finalPosition)
     {       
         Launcher launcher = CreateLauncher(_defaultLauncherPrefab, centerPosition, finalPosition);

@@ -3,7 +3,7 @@ using Zenject;
 
 public sealed class EntryPoint : MonoBehaviour
 {
-    [Inject] private IslandGenerator _islandGenerator;
+    [SerializeField] private IslandGenerator _islandGenerator;
     [Inject] private WaveManager _waveManager; 
 
     private void Start()

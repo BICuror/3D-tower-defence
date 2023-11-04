@@ -5,12 +5,10 @@ using Zenject;
 public sealed class EnemyBiomeGenerator : MonoBehaviour
 {
     [Inject] private IslandData _islandData;
-    [Inject] private IslandGenerator _islandGenerator;
     [Inject] private SpawnerRoadNodeGenerator _spawnerRoadNodeGenerator;
     [Inject] private EnemyBiomeContainer _enemyBiomeContainer;
     [Inject] private RoadNodeGenerator _roadNodeGenerator;
     [Inject] private DiContainer _diContainer;
-    [Inject] private IslandDecorationContainer _islandDecorationContainer;
 
     [SerializeField] private EnemyBiome _enemyBiomePrefab;
 

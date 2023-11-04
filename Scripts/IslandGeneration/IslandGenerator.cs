@@ -6,7 +6,7 @@ public sealed class IslandGenerator : MonoBehaviour
     #region Dependencies
     [Inject] private IslandData _islandData;
     [Inject] private TextureManager _textureManager;
-    [Inject] private IslandDecorationGenerator _decorationGenerator;
+    [Inject] private IslandDecorationGenerator _islandDecorationGenerator;
     [Inject] private EnemyBiomeGenerator _enemyBiomeGenerator;
     [Inject] private EnviromentCreator _enviromentCreator;
     [Inject] private BiomeMapGenerator _biomeMapGenerator;
@@ -14,12 +14,9 @@ public sealed class IslandGenerator : MonoBehaviour
     [Inject] private RoadGenerator _roadGenerator;
     [Inject] private RoadNodeGenerator _nodeGenerator;
     [Inject] private IslandTerrainMeshCreator _islandTerrainMeshCreator;
+    [Inject] private IslandGridHolder _islandGridHolder;
+    [Inject] private IslandHeightMapHolder _islandHeightMapHolder;
     #endregion
-
-    private BlockGrid _blockGrid;
-    public BlockGrid IslandGrid => _blockGrid;
-
-    private int[,] _heightMap;
 
     public void GenerateIsland()
     {
@@ -47,24 +44,24 @@ public sealed class IslandGenerator : MonoBehaviour
 
     private void GetHeightMap()
     {
-        _heightMap = _heightMapGenerator.GenerateHeightMap(_biomeMapGenerator);
+        _islandHeightMapHolder.Map = _heightMapGenerator.GenerateHeightMap(_biomeMapGenerator);
     }
     
     private void ConvertHeightMapToBlockGrid()
     {
         IslandHeightMapToGridConverter converter = new IslandHeightMapToGridConverter();
 
-        _blockGrid = converter.Convert(_heightMap, _islandData);
+        _islandGridHolder.Grid = converter.Convert(_islandHeightMapHolder.Map, _islandData);
     }
 
     private void GenerateTerrainMesh()
     {
-        _islandTerrainMeshCreator.CreateMesh(_blockGrid);
+        _islandTerrainMeshCreator.CreateMesh(_islandGridHolder.Grid);
     }
 
     private void GenerateDecorations()
     {
-        _decorationGenerator.GenerateDecorations(_blockGrid, Vector2.zero); 
+        _islandDecorationGenerator.GenerateDecorations(_islandGridHolder.Grid, Vector2.zero); 
     }
 
     private void SetupNodes() => _nodeGenerator.SetupNodes();          
@@ -73,6 +70,6 @@ public sealed class IslandGenerator : MonoBehaviour
     {
         int _centerPoint = Mathf.RoundToInt(_islandData.IslandSize / 2);
 
-        _enviromentCreator.CreateEnviroment(new Vector3(_centerPoint, _heightMap[_centerPoint, _centerPoint], _centerPoint));
+        _enviromentCreator.CreateEnviroment(new Vector3(_centerPoint, _islandGridHolder.Grid.GetMaxHeight(_centerPoint, _centerPoint), _centerPoint));
     }
 }

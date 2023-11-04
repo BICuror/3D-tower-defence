@@ -3,9 +3,7 @@ using Zenject;
 
 public sealed class TerrainGenerationInstaller : MonoInstaller
 {
-    [SerializeField] private IslandGenerator _islandGenerator;
     [SerializeField] private IslandDecorationGenerator _decorationGenerator;
-    [SerializeField] private EnemyBiomeGenerator _enemyBiomeGenerator;
     [SerializeField] private EnviromentCreator _enviromentCreator;
     [SerializeField] private WaveManager _waveManager; 
     [SerializeField] private IslandTerrainMeshCreator _islandTerrainMeshCreator;
@@ -22,7 +20,5 @@ public sealed class TerrainGenerationInstaller : MonoInstaller
         Container.Bind<IslandTerrainMeshCreator>().FromInstance(_islandTerrainMeshCreator).AsSingle().NonLazy();
         Container.Bind<EnviromentCreator>().FromInstance(_enviromentCreator).AsSingle().NonLazy();
         Container.Bind<WaveManager>().FromInstance(_waveManager).AsSingle().NonLazy();
-
-        Container.Bind<IslandGenerator>().FromInstance(_islandGenerator).AsSingle().NonLazy();
     }
 }

@@ -218,6 +218,7 @@ Transform:
   m_Children:
   - {fileID: 1125240001}
   - {fileID: 910443200}
+  - {fileID: 2142972739}
   - {fileID: 2099434305}
   - {fileID: 564568252}
   - {fileID: 20957094}
@@ -977,6 +978,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _stopAction: 0
   _visualEffect: {fileID: 501217201}
+--- !u!1 &514544352
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 514544354}
+  - component: {fileID: 514544353}
+  m_Layer: 0
+  m_Name: GenerationDataInstaller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &514544353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 514544352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 007aaaac098a1324c8e93f7d6ba881cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &514544354
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 514544352}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1136076231}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &532478017
 GameObject:
   m_ObjectHideFlags: 0
@@ -1509,9 +1554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fae257249610b14a965036cc87f30e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _islandGenerator: {fileID: 32533205}
   _decorationGenerator: {fileID: 2099434307}
-  _enemyBiomeGenerator: {fileID: 910443196}
   _enviromentCreator: {fileID: 2050449043}
   _waveManager: {fileID: 1125240000}
   _islandTerrainMeshCreator: {fileID: 1189632683}
@@ -1802,8 +1845,6 @@ GameObject:
   - component: {fileID: 910443200}
   - component: {fileID: 910443199}
   - component: {fileID: 910443198}
-  - component: {fileID: 910443196}
-  - component: {fileID: 910443201}
   - component: {fileID: 910443202}
   m_Layer: 0
   m_Name: EnemyBiomeManager
@@ -1812,19 +1853,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &910443196
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 910443195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c28842963b9a324da13ce23d0b09289, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _enemyBiomePrefab: {fileID: 5615790595464292867, guid: 9fc41624638a6e84f9b3166605d7d03f, type: 3}
 --- !u!114 &910443198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1886,18 +1914,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 32533206}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &910443201
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 910443195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c1c3c4a3dfc2308429d72908340ac087, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &910443202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2216,6 +2232,51 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 1126fc0012de5c648b801f91ae5a7ae9, type: 2}
+--- !u!1 &985121345
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 985121346}
+  - component: {fileID: 985121347}
+  m_Layer: 0
+  m_Name: DraggableLogicInstaller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &985121346
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985121345}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1136076231}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &985121347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985121345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 332612a7ff6a0dd44bb056566afa2ceb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _draggableCreator: {fileID: 20957093}
 --- !u!1 &1010296631
 GameObject:
   m_ObjectHideFlags: 0
@@ -2676,6 +2737,8 @@ Transform:
   - {fileID: 1364348708}
   - {fileID: 1345661420}
   - {fileID: 2133134880}
+  - {fileID: 514544354}
+  - {fileID: 985121346}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1136076232
@@ -2697,6 +2760,7 @@ MonoBehaviour:
   - {fileID: 1345661419}
   - {fileID: 1364348709}
   - {fileID: 2133134881}
+  - {fileID: 514544353}
   _installerPrefabs: []
   _autoRun: 1
   OnPreInstall:
@@ -3120,8 +3184,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa97de7b220d8044bb4c59cbb3bcfd10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyBiomeGenerator: {fileID: 910443196}
-  _enemyBiomeMeshGenerator: {fileID: 910443201}
+  _enemyBiomeGenerator: {fileID: 2142972744}
+  _enemyBiomeMeshGenerator: {fileID: 2142972743}
+  _overlappingIslandDecorationsDisabler: {fileID: 2142972741}
+  _enemyBiomeMapToGridConverter: {fileID: 2142972740}
+  _enemyBiomeMapGenerator: {fileID: 2142972742}
 --- !u!1 &1393639210
 GameObject:
   m_ObjectHideFlags: 0
@@ -3572,6 +3639,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f113551191e95c74cacb51f225db9991, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _islandGenerator: {fileID: 32533205}
 --- !u!4 &1778413792
 Transform:
   m_ObjectHideFlags: 0
@@ -4064,6 +4132,103 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemySpawnerSystem: {fileID: 910443199}
+--- !u!1 &2142972738
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2142972739}
+  - component: {fileID: 2142972744}
+  - component: {fileID: 2142972743}
+  - component: {fileID: 2142972742}
+  - component: {fileID: 2142972741}
+  - component: {fileID: 2142972740}
+  m_Layer: 0
+  m_Name: EnemyBiomeGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2142972739
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142972738}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 32533206}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2142972740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142972738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87a3041614f4b3d45b307c9e54d34078, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2142972741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142972738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5be128a96a0c4a547b91ca8aa66b6d3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2142972742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142972738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c6567478517ec14da91681dd5c3228f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2142972743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142972738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1c3c4a3dfc2308429d72908340ac087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2142972744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142972738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c28842963b9a324da13ce23d0b09289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyBiomePrefab: {fileID: 5615790595464292867, guid: 9fc41624638a6e84f9b3166605d7d03f, type: 3}
 --- !u!23 &675847606664241366
 MeshRenderer:
   m_ObjectHideFlags: 0

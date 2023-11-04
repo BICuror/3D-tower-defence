@@ -9,6 +9,7 @@ public sealed class Townhall : MonoBehaviour
 {
     [Inject] private IslandData _islandData;
     [Inject] private WaveManager _waveManager;
+    [Inject] private DraggableCreator _draggableCreator;
 
     [Header("Links")]
     [SerializeField] private TownhallCrystalDetector _townhallCrystalDetector;
@@ -45,7 +46,7 @@ public sealed class Townhall : MonoBehaviour
 
     private void CreateCrystal(float blank)
     {
-        DraggableCreator.Instance.CreateDraggableOnRandomPosition(_crystalPrefab, _creationSource.position, 3, null, _crystalLauncher);
+        _draggableCreator.CreateDraggableOnRandomPosition(_crystalPrefab, _creationSource.position, 3, null, _crystalLauncher);
 
         CrystalDestroyed.Invoke();
     }
@@ -66,7 +67,7 @@ public sealed class Townhall : MonoBehaviour
     {
         for (int i = 0; i < _towerAmount; i++)
         {
-            DraggableCreator.Instance.CreateDraggableOnRandomPosition(_towerToCreate, _creationSource.position, _towerCreationRadius, _terrainSetting);
+            _draggableCreator.CreateDraggableOnRandomPosition(_towerToCreate, _creationSource.position, _towerCreationRadius, _terrainSetting);
         }
     }
 }
