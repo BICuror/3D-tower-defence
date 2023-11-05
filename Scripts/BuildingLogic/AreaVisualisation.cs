@@ -1,64 +1,45 @@
-using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 
 public sealed class AreaVisualisation : MonoBehaviour
 {
-    [Header("VisualisationSettings")]
-    [SerializeField] private int _visualisationFrameDuration;
+    [Header("Curves")]
+    [SerializeField] private AnimationCurve _visualisationAppearCurve;
+    [SerializeField] private AnimationCurve _visualisationDisappearCurve;
 
-    [SerializeField] private AnimationCurve _appearSpeedCurve;
+    [Header("VisualisationSettings")]
+    [SerializeField] private float _visualisationDuration;
 
     [SerializeField] private GameObject _reachAreaVisualisation;
+
+    private Tween _currentTween;
+
+    private void SetVisualisationScale(Vector3 scale)
+    {
+        _reachAreaVisualisation.transform.localScale = scale;
+    }
 
     public void ActivateVisualisation(GameObject draggable)
     {
         if (draggable.TryGetComponent<AreaManager>(out AreaManager manager))
         {
-            StopAllCoroutines();
-
             _reachAreaVisualisation.SetActive(true);
 
-            StartCoroutine(VisualisationAppear(manager.GetScale()));
+            if (_currentTween == null || _currentTween.IsPlaying()) _currentTween.Kill();
+
+            _currentTween = DOVirtual.Vector3(Vector3.zero, manager.GetScale(), _visualisationDuration, SetVisualisationScale).SetEase(_visualisationAppearCurve);
         }
-    }
-    
-    private IEnumerator VisualisationAppear(Vector3 finalScale)
-    {
-        YieldInstruction instruction = new WaitForFixedUpdate();
-
-        for (float i = 0; i <= _visualisationFrameDuration; i++)
-        {
-            yield return instruction;
-
-            float scale = Mathf.Lerp(0f, finalScale.x, _appearSpeedCurve.Evaluate(i / (float)(_visualisationFrameDuration)));
-
-            _reachAreaVisualisation.transform.localScale = new Vector3(scale, finalScale.y, scale);
-        }  
     }
 
     public void DisactivateVisualisation(GameObject draggable)
     {
         if (draggable.TryGetComponent<AreaManager>(out AreaManager manager))
-        {
-            StopAllCoroutines();
+        {   
+            if (_currentTween == null || _currentTween.IsPlaying()) _currentTween.Kill();
 
-            StartCoroutine(VisualisationDisappear(manager.GetScale()));
+            _currentTween = DOVirtual.Vector3(manager.GetScale(), Vector3.zero, _visualisationDuration, SetVisualisationScale).SetEase(_visualisationDisappearCurve).OnComplete(DisableVisualisationObject);
         }
     }
 
-    private IEnumerator VisualisationDisappear(Vector3 initialScale)
-    {
-        YieldInstruction instruction = new WaitForFixedUpdate();
-
-        for (float i = 0; i <= _visualisationFrameDuration; i++)
-        {
-            yield return instruction;
-
-            float scale = Mathf.Lerp(initialScale.x, 0, _appearSpeedCurve.Evaluate(i / (float)(_visualisationFrameDuration)));
-
-            _reachAreaVisualisation.transform.localScale = new Vector3(scale, initialScale.y, scale);
-        }
-        
-        _reachAreaVisualisation.SetActive(false);
-    }
+    private void DisableVisualisationObject() => _reachAreaVisualisation.SetActive(false);
 }

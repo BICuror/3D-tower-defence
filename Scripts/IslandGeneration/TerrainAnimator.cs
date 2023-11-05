@@ -1,9 +1,11 @@
-using System.Collections;
+using DG.Tweening;
 using UnityEngine.Events;
 using UnityEngine;
 
 public sealed class TerrainAnimator : MonoBehaviour
 {
+    [SerializeField] private AnimationCurve _transitionCurve;
+
     [SerializeField] private float _radius;
 
     [SerializeField] private Material _baseMaterial;
@@ -14,7 +16,6 @@ public sealed class TerrainAnimator : MonoBehaviour
     private MeshRenderer _meshRenderer;
 
     public UnityEvent AnitmationStarted;
-
     public UnityEvent AnimationEnded;
 
     private void Awake()
@@ -28,68 +29,32 @@ public sealed class TerrainAnimator : MonoBehaviour
     {
         _transitionMaterial.SetVector("Center", position);
     }
+    
+    private void SetRadiusToTransitionMaterial(float radius)
+    {
+        _transitionMaterial.SetFloat("Distance", radius);
+    }
 
     public void StartDisappearing(float duration)
     {
-        StopAllCoroutines();
-
         _meshRenderer.sharedMaterial = _transitionMaterial;
-
-        StartCoroutine(Disappear(duration));
-
+        
         AnitmationStarted.Invoke();
-    }
 
-    private IEnumerator Disappear(float duration)
-    {
-        YieldInstruction instruction = new WaitForFixedUpdate();
-
-        float elapsedTime = 0f;
-
-        while (duration >= elapsedTime)
-        {
-            elapsedTime += Time.deltaTime;
-
-            float evaluatedValue = elapsedTime / duration;
-
-            float currentRadius = Mathf.Lerp(_radius, 0f, evaluatedValue);
-
-            _transitionMaterial.SetFloat("Distance", currentRadius);
-            
-            yield return instruction;
-        }
+        DOVirtual.Float(_radius, 0, duration, SetRadiusToTransitionMaterial).SetEase(_transitionCurve);
     }
 
     public void StartAppearing(float duration)
     {
-        StopAllCoroutines();
-
         _meshRenderer.sharedMaterial = _transitionMaterial;
 
-        StartCoroutine(Appear(duration));
+        DOVirtual.Float(0, _radius, duration, SetRadiusToTransitionMaterial).SetEase(_transitionCurve).OnComplete(Appear);
     }
 
-    private IEnumerator Appear(float duration)
+    private void Appear()
     {
-        YieldInstruction instruction = new WaitForFixedUpdate();
-
-        float elapsedTime = 0f;
-
-        while (duration >= elapsedTime)
-        {
-            elapsedTime += Time.deltaTime;
-
-            float evaluatedValue = elapsedTime / duration;
-
-            float currentRadius = Mathf.Lerp(0f, _radius, evaluatedValue);
-
-            _transitionMaterial.SetFloat("Distance", currentRadius);
-            
-            yield return instruction;
-        }
-        
         _meshRenderer.sharedMaterial = _baseMaterial;
-        
+
         AnimationEnded.Invoke();
     }    
 }

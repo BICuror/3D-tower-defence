@@ -131,8 +131,6 @@ public sealed class DraggableCreator : MonoBehaviour
 
                         if (hits.Length == 0)
                         {
-                            Debug.Log("Nothing at x: " + x.ToString() + " z: " + z.ToString());
-
                             possiblePositions.Add(new Vector3(x, rayInfo.point.y + 0.5f, z));
                         }
                     }                   

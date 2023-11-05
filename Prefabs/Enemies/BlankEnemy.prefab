@@ -307,6 +307,7 @@ GameObject:
   - component: {fileID: 675977964231776498}
   - component: {fileID: 7209392220105224021}
   - component: {fileID: 4790466594771268099}
+  - component: {fileID: 5666224592900865097}
   m_Layer: 8
   m_Name: BlankEnemy
   m_TagString: Enemy
@@ -389,7 +390,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 4946998955840327174}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.25
+  m_Radius: 0.1
   m_Speed: 0.75
   m_Acceleration: 8
   avoidancePriority: 50
@@ -397,7 +398,7 @@ NavMeshAgent:
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 1
-  m_AutoRepath: 0
+  m_AutoRepath: 1
   m_Height: 1
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
@@ -466,7 +467,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _linkTravelDuration: 0.8
+  _linkTravelDuration: 0.75
 --- !u!114 &3470423544607155355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -505,7 +506,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 861394054ef27ec4ebfcace0eca832f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _effectSource: {fileID: 2570302429716322570}
   EffectApplied:
     m_PersistentCalls:
       m_Calls: []
@@ -620,6 +620,21 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5666224592900865097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4946998955840327174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57ab05c8a60fd2449be5ed0f91abdb06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _shakeDuration: 0.5
+  _shakeStrength: 0.5
+  _mesh: {fileID: 863538508445461208}
 --- !u!1 &5936118863575348267
 GameObject:
   m_ObjectHideFlags: 0

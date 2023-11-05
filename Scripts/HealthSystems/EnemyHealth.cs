@@ -14,6 +14,8 @@ public class EnemyHealth : EntityHealth
         _incomingDamageMultipluer = enemyData.IncomingDamageMultipluer;
 
         HealFully();
+
+        EnableHealthBar();
     }
 
     private void OnCollisionEnter(Collision other) 
@@ -25,8 +27,6 @@ public class EnemyHealth : EntityHealth
             Die();
         }    
     }
-
-    private void OnDisable() => EnableHealthBar();
 
     public override void Die()
     {

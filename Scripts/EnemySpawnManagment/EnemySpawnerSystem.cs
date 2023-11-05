@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Zenject;
 
 public sealed class EnemySpawnerSystem : MonoBehaviour
 {
-    [SerializeField] private float _wheightForWave;  
+    [Inject] private WaveManager _waveManager;
 
-    [SerializeField] private WaveManager _waveManager;
+    [SerializeField] private float _wheightForWave; 
 
     private List<EnemySpawner> _spawners = new List<EnemySpawner>();
-    
     [SerializeField] private EnemyWavesData _enemyWavesData;
 
     public UnityEvent AllEnemiesDied;

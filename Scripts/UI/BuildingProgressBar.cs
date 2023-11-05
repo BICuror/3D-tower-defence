@@ -1,49 +1,48 @@
-using System.Collections;
-using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
-public class BuildingProgressBar : MonoBehaviour
+[RequireComponent(typeof(MeshRenderer))]
+
+public sealed class BuildingProgressBar : Shaker
 {
     [SerializeField] private Material _progressBarMaterial;
+    private MeshRenderer _meshRenderer;
+    private MaterialPropertyBlock _materialPropertyBlock;
 
-    private Material _currentProgressBarMaterial;
+    private Tween _currentTween;
 
-    private void OnEnable() => CreateAndSetNewMaterial();
+    private void Awake()
+    { 
+        _meshRenderer = GetComponent<MeshRenderer>();
 
-    private void CreateAndSetNewMaterial()
-    {
-        _currentProgressBarMaterial = new Material(_progressBarMaterial);
-
-        gameObject.GetComponent<MeshRenderer>().material = _currentProgressBarMaterial;
+        _meshRenderer.sharedMaterial = _progressBarMaterial;
+        _materialPropertyBlock = new MaterialPropertyBlock();
     }
 
-    public void StartFillingBar(float time)
+    private void SetPropertyBlock(float progressValue)
+    {
+        _materialPropertyBlock.SetFloat("BuildProgress", progressValue);
+        _meshRenderer.SetPropertyBlock(_materialPropertyBlock);
+    }
+
+    public void StartFillingBar(float duration)
     {
         gameObject.SetActive(true);
 
-        float step = 1f / time / 50f;
-
-        _currentProgressBarMaterial.SetFloat("BuildValue", 0f);
-
-        StartCoroutine(FillBar(step));
-    }
-
-    private IEnumerator FillBar(float step)
-    {
-        yield return new WaitForFixedUpdate();
-
-        float currentHealth = _currentProgressBarMaterial.GetFloat("BuildValue");
-
-        _currentProgressBarMaterial.SetFloat("BuildValue", currentHealth + step);
-
-        if (currentHealth + step < 1f) StartCoroutine(FillBar(step));
-        else gameObject.SetActive(false);
+        ShakeDuration = duration;
+        Shake();
+        
+        _currentTween = DOVirtual.Float(1f, 0f, duration, SetPropertyBlock).SetEase(Ease.Linear).OnComplete(StopFillingBar);
     }
 
     public void StopFillingBar()
     {
-        StopAllCoroutines();
+        if (_currentTween != null && _currentTween.IsPlaying()) _currentTween.Kill();
+
+        transform.DOKill();
 
         gameObject.SetActive(false);
     }
+
+    private void OnDestroy() => StopFillingBar();
 }

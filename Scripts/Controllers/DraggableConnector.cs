@@ -34,10 +34,6 @@ public sealed class DraggableConnector : MonoBehaviour
 
         Vector3 finalRotation = new Vector3(0f, GetFinalYRotation(objectToPlace.transform.rotation.eulerAngles.y), 0f);
 
-        
-        Debug.Log(objectToPlace.transform.rotation.eulerAngles.y.ToString());
-        Debug.Log(finalRotation.y.ToString());
-
         for(float i = 0; i <= _placementFramesDuration; i++)
         {
             yield return instruction;

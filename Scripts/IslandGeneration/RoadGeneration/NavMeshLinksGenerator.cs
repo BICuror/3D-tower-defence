@@ -59,11 +59,11 @@ public class NavMeshLinksGenerator : MonoBehaviour
     {
         if (currentPos.y > dir.y) return; 
 
-        _jumpLinks.Add(Instantiate(_jumpLink, Vector3.zero, Quaternion.identity));
+        _jumpLinks.Add(Instantiate(_jumpLink, Vector3.zero + new Vector3(0f, 0.5f, 0f), Quaternion.identity));
 
         NavMeshLink link = _jumpLinks[_jumpLinks.Count - 1].GetComponent<NavMeshLink>();
 
-        link.startPoint = new Vector3(Mathf.Lerp(currentPos.x, dir.x, 0.4f), currentPos.y, Mathf.Lerp(currentPos.z, dir.z, 0.4f));
-        link.endPoint = new Vector3(Mathf.Lerp(dir.x, currentPos.x, 0.4f), dir.y, Mathf.Lerp(dir.z, currentPos.z, 0.4f));
+        link.startPoint = new Vector3(Mathf.Lerp(currentPos.x, dir.x, 0.1f), currentPos.y, Mathf.Lerp(currentPos.z, dir.z, 0.1f));
+        link.endPoint = new Vector3(Mathf.Lerp(dir.x, currentPos.x, 0.1f), dir.y, Mathf.Lerp(dir.z, currentPos.z, 0.1f));
     }
 }

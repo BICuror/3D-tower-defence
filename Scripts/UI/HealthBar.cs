@@ -1,118 +1,149 @@
-using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
+using UnityEngine;
+using DG.Tweening;
 
 public class HealthBar : MonoBehaviour
 {
-    private float _decreaseTime = 0.2f;
+    #region ShakeSettings
+    private float _shakeDuration = 0.3f;
+    private float _shakeRotationStrength = 45f;
+    private float _shakeScaleStrength = 0.04f;
+    private Tween _shakeRotationTween;
+    private Tween _shakeScaleTween;
+    private Vector3 _defaultScale;
+    #endregion
 
-    private float _timeBeforeDecrease = 0.8f;
+    #region CurrentHealthTweeningSettings
+    private float _currentHealthChangeDuration = 0.1f;
+    private Tween _currentHealthTween;
+    #endregion
 
-    private float _shakeDuration = 0.27f;
-
-    private float _shakeStrength = 6f;
+    #region HealthDifferenceTweeningSettings
+    private float _healthDifferenceDecreaseTime = 0.2f;
+    private float _timeBeforeDecreasingHealthDifference = 0.8f;
+    private YieldInstruction _healthDifferenceChangeWait;
+    private Tween _currentHealthDifferenceTween;
+    #endregion
 
     private MeshRenderer _meshRenderer;
 
     private float _lastSetHealthDifferecne;
+    private float _lastSetHealth;
+    private float _currentDisplayedHealth;
 
-    private YieldInstruction _yieldInstruction = new WaitForFixedUpdate();
+    private MaterialPropertyBlock _materialPropertyBlock;
 
     private void Awake()
     {
+        _defaultScale = transform.localScale;
         _meshRenderer = GetComponent<MeshRenderer>();
 
-        _meshRenderer.SetPropertyBlock(new MaterialPropertyBlock());
+        _materialPropertyBlock = new MaterialPropertyBlock();
+        _meshRenderer.SetPropertyBlock(_materialPropertyBlock);
+
+        _healthDifferenceChangeWait = new WaitForSeconds(_timeBeforeDecreasingHealthDifference);
     }
 
-    public void SetValue(float health) => SetPropertyBlock(health, health);
-
-    public void DecreaseValue(float currentHealth, float healthDifference)
+    private void OnDisable() 
     {
-        if (_lastSetHealthDifferecne < healthDifference) _lastSetHealthDifferecne = healthDifference;
-        else _lastSetHealthDifferecne *= 0.95f;
-
-        SetPropertyBlock(currentHealth, _lastSetHealthDifferecne);
-
+        transform.DOKill();
         StopAllCoroutines();
+    }    
 
-        StartCoroutine(StartDecreasingHealthDifference(currentHealth));
-    }
-
-    public void IncreaseValue(float currentHealth)
+    public void SetValue(float health) 
     {
-        float healthDifference = currentHealth;
-
-        StopAllCoroutines();
-
-        ShakeSlider();
-
-        if (currentHealth < _lastSetHealthDifferecne) healthDifference = _lastSetHealthDifferecne;
-            
-        SetPropertyBlock(currentHealth, healthDifference);
+        _lastSetHealth = health;
+        _currentDisplayedHealth = health;
+        _lastSetHealthDifferecne = health;
+        SetPropertyBlock(health, health);
     }
 
     private void SetPropertyBlock(float currentHealth, float healthDifference)
     {
-        MaterialPropertyBlock healthDifferenceBlock = new MaterialPropertyBlock();
-        healthDifferenceBlock.SetFloat("Health", currentHealth);
-        healthDifferenceBlock.SetFloat("HealthDifference", healthDifference);
-        _meshRenderer.SetPropertyBlock(healthDifferenceBlock);
-    }
-
-    private IEnumerator StartDecreasingHealthDifference(float currentHealth)
-    {
-        StartCoroutine(ShakeSlider());
-
-        yield return new WaitForSeconds(_timeBeforeDecrease);
-
-        StartCoroutine(DecreaseSlider(currentHealth));
-    }
-
-    private IEnumerator ShakeSlider()
-    {
-        SetToDefaultPosition();
-
-        float amountOfSetps = Mathf.RoundToInt(50f * _shakeDuration);
-
-        float rotationValue = Random.Range(0.7f, 1.5f);
-        if (Random.Range(0, 100) > 50) rotationValue *= -1;
-
-        float positionValue = Random.Range(0.7f, 1.5f);
-        if (Random.Range(0, 100) > 50) positionValue *= -1;
-
-        for(int i = 0; i <= amountOfSetps; i++)
-        {
-            float evaluatedValue = i / amountOfSetps;
-
-            transform.Rotate(0f, rotationValue * Mathf.Sin(Mathf.Deg2Rad * evaluatedValue * 720f) * _shakeStrength, 0f);
-
-            transform.localPosition = new Vector3(0f, 0f, positionValue * Mathf.Sin(Mathf.Deg2Rad * evaluatedValue * 360) * _shakeStrength * 0.02f);
-            
-            yield return _yieldInstruction;
-        }
-    }
-
-    private IEnumerator DecreaseSlider(float currentHealth)
-    {
-        float amountOfSetps = Mathf.RoundToInt(50f * _decreaseTime);
-
-        float healthDecreaseStep = (_lastSetHealthDifferecne - currentHealth) / amountOfSetps;
-
-        for(int i = 0; i < amountOfSetps; i++)
-        {
-            _lastSetHealthDifferecne -= healthDecreaseStep;
-
-            SetPropertyBlock(currentHealth, _lastSetHealthDifferecne);
-            
-            yield return _yieldInstruction;
-        }
+        _materialPropertyBlock.SetFloat("Health", currentHealth);
+        _materialPropertyBlock.SetFloat("HealthDifference", healthDifference);
+        _meshRenderer.SetPropertyBlock(_materialPropertyBlock);
     }
 
     private void SetToDefaultPosition()
     {
         transform.localRotation = Quaternion.identity;
 
-        transform.localPosition = Vector3.zero;
+        transform.localScale = _defaultScale;
     }
+
+    #region Decrease
+    public void DecreaseValue(float currentHealth, float healthDifference)
+    {
+        if (_lastSetHealthDifferecne < healthDifference) _lastSetHealthDifferecne = healthDifference;
+        else _lastSetHealthDifferecne *= 0.95f;
+
+        _lastSetHealth = currentHealth;
+
+        ShakeSlider();
+
+        DecreaseCurrentHealth();
+        
+        StopAllCoroutines();
+        StartCoroutine(DecreaseHealthDifference());
+    }
+
+    private void DecreaseCurrentHealth()
+    {
+        if (_currentHealthTween != null && _currentHealthTween.IsPlaying()) _currentHealthTween.Kill();
+
+        _currentHealthTween = DOVirtual.Float(_currentDisplayedHealth, _lastSetHealth, _currentHealthChangeDuration, SetCurrentHealth);
+
+        void SetCurrentHealth(float currentHealth)
+        {
+            _currentDisplayedHealth = currentHealth;
+            SetPropertyBlock(_currentDisplayedHealth, _lastSetHealthDifferecne);
+        }
+    }
+
+    private IEnumerator DecreaseHealthDifference()
+    {
+        if (_currentHealthDifferenceTween != null && _currentHealthDifferenceTween.IsPlaying()) _currentHealthDifferenceTween.Kill();
+
+        yield return _healthDifferenceChangeWait;
+
+        _currentHealthDifferenceTween = DOVirtual.Float(_lastSetHealthDifferecne, _lastSetHealth, _healthDifferenceDecreaseTime, SetCurrentHealthDifference);
+
+        void SetCurrentHealthDifference(float currentHealth)
+        {
+            _lastSetHealthDifferecne = currentHealth;
+            SetPropertyBlock(_currentDisplayedHealth, _lastSetHealthDifferecne);
+        }
+    }
+    
+    #endregion
+
+    public void IncreaseValue(float currentHealth)
+    {
+        if (_currentHealthTween != null && _currentHealthTween.IsPlaying()) _currentHealthTween.Kill();
+        if (_currentHealthDifferenceTween != null && _currentHealthDifferenceTween.IsPlaying()) _currentHealthDifferenceTween.Kill();
+        StopAllCoroutines();
+
+        ShakeSlider();
+
+        float healthDifference = currentHealth;
+        if (currentHealth < _lastSetHealthDifferecne) healthDifference = _lastSetHealthDifferecne;
+            
+        SetPropertyBlock(currentHealth, healthDifference);
+    }
+
+    private void ShakeSlider()
+    {
+        if (_shakeRotationTween != null && _shakeRotationTween.IsPlaying() == true)
+        {
+            _shakeRotationTween.Kill();
+            _shakeScaleTween.Kill();
+            SetToDefaultPosition();
+        }
+
+        _shakeRotationTween = transform.DOShakeRotation(_shakeDuration, _shakeRotationStrength);
+        _shakeScaleTween = transform.DOShakeScale(_shakeDuration, _shakeScaleStrength);
+    }
+
+    private void OnDestroy() => transform.DOKill();
 }
