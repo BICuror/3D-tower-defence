@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "LayerSetting", menuName = "Block Tower Defence/LayerSetting")]
+[CreateAssetMenu(fileName = "LayerSetting", menuName = "LayerSetting")]
 
 public sealed class LayerSetting : ScriptableObject 
 {

@@ -4,5 +4,10 @@ using UnityEngine;
 
 public sealed class TaskCycleShaker : Shaker
 {
-    private void Awake() => GetComponent<TaskCycle>().TaskPerformed.AddListener(Shake);
+    private void Awake()
+    {
+        CaptureDefaultScale();
+
+        GetComponent<TaskCycle>().TaskPerformed.AddListener(Shake);
+    }
 }

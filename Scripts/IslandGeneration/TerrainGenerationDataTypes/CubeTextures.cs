@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "CubeTextures", menuName = "ScriptableObjects/CubeTextures")]
+[CreateAssetMenu(fileName = "CubeTextures", menuName = "Generation/CubeTextures")]
 
 public sealed class CubeTextures : ScriptableObject
 {       

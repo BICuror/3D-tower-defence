@@ -13,16 +13,12 @@ public sealed class EnemySpawner : MonoBehaviour
 
     private void Awake()
     {
-        FindObjectOfType<EnemySpawnerSystem>().AddSpawner(this);
-
         _spawnedEnemies = new List<GameObject>();
 
         //LastEnemyKilled.AddListener(StopAllCoroutines);
         //LastEnemyKilled.AddListener(TrySpawnEnemy);
     }
 
-    public void DeactivateSpawner() => FindObjectOfType<EnemySpawnerSystem>().RemoveSpawner(this);
-    
     public bool AllEnemiesDead() => _spawnedEnemies.Count == 0;
 
 

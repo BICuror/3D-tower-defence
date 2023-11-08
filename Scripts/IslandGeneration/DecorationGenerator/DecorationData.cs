@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "DecorationData", menuName = "ScriptableObjects/DecorationData")]
+[CreateAssetMenu(fileName = "DecorationData", menuName = "Generation/DecorationData")]
 
 public sealed class DecorationData :  ScriptableObject
 {

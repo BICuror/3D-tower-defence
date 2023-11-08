@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EdgeSpawnerPositionValidator", menuName = "SpawnerPositionValidators/EdgeSpawnerPositionValidator")]
+[CreateAssetMenu(fileName = "EdgeSpawnerPositionValidator", menuName = "Generation/SpawnerPositionValidators/EdgeSpawnerPositionValidator")]
 public class EdgeSpawnerPositionValidator : SpawnerPositionValidator
 {
     public override bool IsValidPosition(int x, int maxX, int z, int maxZ)

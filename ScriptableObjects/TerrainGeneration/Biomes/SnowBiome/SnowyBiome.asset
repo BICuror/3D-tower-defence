@@ -15,12 +15,14 @@ MonoBehaviour:
   _eniviromentObject: {fileID: 6457869471833738900, guid: 9798b6e851461204788da6d39ad26980, type: 3}
   _eniviromentTexture: {fileID: 2800000, guid: 42478942f540a38429adacea8fd2ca50, type: 3}
   _buildingsTexture: {fileID: 2800000, guid: f06d05fc0be946d4399435f00f80051b, type: 3}
-  _roadType: 1
-  _spawnerPositionValidator: {fileID: 11400000, guid: 17cc441cdf3207f4884e2a5ca7538876, type: 2}
   _roadBlock: {fileID: 11400000, guid: 4575c324f94f1b94081d04dd70db8603, type: 2}
   _roadBlockOnWater: {fileID: 11400000, guid: 18c1deecf11959849970502f93aefdaf, type: 2}
-  _amountOfRoadNodesBetweenCenterAndEdge: 2
-  _islandRadius: 12
+  _corruptionBlock: {fileID: 11400000, guid: af3e474824941524d84adbac46c8af6a, type: 2}
+  _corruptionBlockOnWater: {fileID: 11400000, guid: a20e3ce4830c2344bb526b8310ff64c9, type: 2}
+  _spawnerPositionValidator: {fileID: 11400000, guid: 17cc441cdf3207f4884e2a5ca7538876, type: 2}
+  _roadMapGenerationAlgorithm: {fileID: 11400000, guid: 5c70ad30ec549ee4983d9eb0f3fcf3e3, type: 2}
+  _amountOfRoadNodesBetweenCenterAndEdge: 1
+  _islandRadius: 15
   _islandMaxHeight: 40
   _islandHeightOffset: 5
   _biomes:
@@ -372,8 +374,6 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  _corruptionBlock: {fileID: 11400000, guid: af3e474824941524d84adbac46c8af6a, type: 2}
-  _corruptionBlockOnWater: {fileID: 11400000, guid: a20e3ce4830c2344bb526b8310ff64c9, type: 2}
   _corruptionLessZeroHeight: 1
   _smoothingType: 1
   _smoothingStrength: 0.951

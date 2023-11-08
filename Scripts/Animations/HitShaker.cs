@@ -4,5 +4,10 @@ using UnityEngine;
 
 public sealed class HitShaker : Shaker
 {
-    private void Awake() => GetComponent<EntityHealth>().Damaged.AddListener(Shake);
+    private void Awake()
+    {
+        CaptureDefaultScale();
+
+        GetComponent<EntityHealth>().Damaged.AddListener(Shake);
+    }
 }

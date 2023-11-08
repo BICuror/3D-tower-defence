@@ -17,6 +17,8 @@ public sealed class BuildingProgressBar : Shaker
 
         _meshRenderer.sharedMaterial = _progressBarMaterial;
         _materialPropertyBlock = new MaterialPropertyBlock();
+
+        CaptureDefaultScale();
     }
 
     private void SetPropertyBlock(float progressValue)

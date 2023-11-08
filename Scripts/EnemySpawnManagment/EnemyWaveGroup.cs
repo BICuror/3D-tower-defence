@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EnemyWaveGroup", menuName = "Block Tower Defence/EnemyWaveGroup")]
+[CreateAssetMenu(fileName = "EnemyWaveGroup", menuName = "SpawnManagement/EnemyWaveGroup")]
 
 public sealed class EnemyWaveGroup : ScriptableObject 
 {    

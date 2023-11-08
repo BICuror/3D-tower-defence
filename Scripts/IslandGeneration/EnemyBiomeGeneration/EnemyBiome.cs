@@ -13,6 +13,8 @@ public sealed class EnemyBiome : MonoBehaviour
     [Inject] private EnemyBiomeMapGenerator _enemyBiomeMapGenerator;
     [Inject] private EnemyBiomeMapToGridConverter _enemyBiomeMapToGridConverter;
     [Inject] private OverlappingIslandDecorationsDisabler _overlappingIslandDecorationsDisabler;
+    [Inject] private EnemySpawnerSystem _enemySpawnerSystem;
+    [Inject] private SpawnerRotator _spawnerRotator;
 
     [SerializeField] private TerrainSetter _terrainSetter;
     [SerializeField] private EnemySpawner _enemySpawner;
@@ -27,6 +29,11 @@ public sealed class EnemyBiome : MonoBehaviour
     public Vector2Int SpawnerNodeIndex => _spawnerNodeIndex;
 
     private int _currentStage;
+
+    private void Awake()
+    {
+        _enemySpawnerSystem.AddSpawner(_enemySpawner);
+    }
 
     public void SetSpawnerNodeIndex(Vector2Int spawnerNodeIndex) => _spawnerNodeIndex = spawnerNodeIndex;
     public void SetCenterPosition(Vector2Int position)
@@ -65,13 +72,13 @@ public sealed class EnemyBiome : MonoBehaviour
 
         bool[,] enemyBiomeMap = _enemyBiomeMapGenerator.GenerateEnemyMap(GetStage());
 
-        BlockGrid blockGrid = _enemyBiomeMapToGridConverter.ConvertEnemyMapToGrid(enemyBiomeMap, GetStage(), GetBiomePosition());
+        _currentBlockGrid = _enemyBiomeMapToGridConverter.ConvertEnemyMapToGrid(enemyBiomeMap, GetStage(), GetBiomePosition());
 
         _overlappingIslandDecorationsDisabler.DisableOverlappingIslandDecorations(enemyBiomeMap, GetStage(), GetBiomePosition());
 
-        GenerateMesh(blockGrid);
+        GenerateMesh(_currentBlockGrid);
 
-        _currentBlockGrid = blockGrid;
+        _spawnerRotator.RotateSpawner(_enemySpawner.transform);
     }
 
     public void GenerateDecorations()
@@ -98,7 +105,7 @@ public sealed class EnemyBiome : MonoBehaviour
 
     public void Destroy()
     {
-        _enemySpawner.DeactivateSpawner();
+        _enemySpawnerSystem.RemoveSpawner(_enemySpawner);
 
         Destroy(gameObject);
     }   

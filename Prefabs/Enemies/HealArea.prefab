@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _applyEffects:
-  - {fileID: 11400000, guid: f0a19ecdb96d5fd449efcb8e480ad8e8, type: 2}
+  - {fileID: 11400000, guid: 90152d98a5185ee4a945fb631141e2fa, type: 2}
   _enemyEffectManagerAreaScaner: {fileID: 6789171429165042934}
 --- !u!114 &6789171429165042934
 MonoBehaviour:

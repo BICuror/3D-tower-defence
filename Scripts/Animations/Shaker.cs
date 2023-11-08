@@ -13,8 +13,6 @@ public abstract class Shaker : MonoBehaviour
     private Vector3 _defaultScale;
     private Tween _currentTween;
 
-    private void Start() => _defaultScale = _mesh.localScale;
-
     protected void Shake()
     {
         SetDefaultScale();
@@ -26,6 +24,8 @@ public abstract class Shaker : MonoBehaviour
         
         _currentTween = _mesh.DOShakeScale(_shakeDuration, _shakeStrength);
     }
+
+    protected void CaptureDefaultScale() => _defaultScale = _mesh.localScale;
 
     private void SetDefaultScale()
     {

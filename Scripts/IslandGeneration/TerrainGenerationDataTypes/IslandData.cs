@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "IslandData", menuName = "ScriptableObjects/IslandData")]
+[CreateAssetMenu(fileName = "IslandData", menuName = "Generation/IslandData")]
 
 public sealed class IslandData : ScriptableObject
 {
@@ -16,39 +16,43 @@ public sealed class IslandData : ScriptableObject
     [SerializeField] private Texture _buildingsTexture;
     public Texture BuildingsTexture => _buildingsTexture;
 
-    [Header("RoadSettings")][Space] 
-    [SerializeField] private RoadType _roadType;
-    public RoadType RoadTypeToGenerate => _roadType;
-
-    [SerializeField] private SpawnerPositionValidator _spawnerPositionValidator;
-    public SpawnerPositionValidator SpawnerPositionValidator => _spawnerPositionValidator;
-    public enum RoadType
-    {
-        Node,
-        Random
-    }
-    
+    [Space]
     [SerializeField] private CubeTextures _roadBlock;
-    public CubeTextures RoadBlock {get => _roadBlock;}
+    public CubeTextures RoadBlock => _roadBlock;
 
     [SerializeField] private CubeTextures _roadBlockOnWater;
-    public CubeTextures RoadBlockOnWater {get => _roadBlockOnWater;}
+    public CubeTextures RoadBlockOnWater => _roadBlockOnWater;
 
+    [SerializeField] private CubeTextures _corruptionBlock;
+    public CubeTextures CorruptionBlock => _corruptionBlock;   
+
+    [SerializeField] private CubeTextures _corruptionBlockOnWater;
+    public CubeTextures CorruptionBlockOnWater => _corruptionBlockOnWater;    
+
+    [Header("RoadSettings")][Space] 
+    [SerializeField] private SpawnerPositionValidator _spawnerPositionValidator;
+    public SpawnerPositionValidator SpawnerPositionValidator => _spawnerPositionValidator;
+    
+    [SerializeField] private RoadGenerationAlgorithm _roadMapGenerationAlgorithm;
+    public RoadGenerationAlgorithm RoadMapGenerationAlgorithm => _roadMapGenerationAlgorithm;
+
+    [Header("RoadNodeSettings")][Space] 
     [SerializeField] private int _amountOfRoadNodesBetweenCenterAndEdge; 
-    public int AmountOfRoadNodesBetweenCenterAndEdge {get => _amountOfRoadNodesBetweenCenterAndEdge;}
+    public int AmountOfRoadNodesBetweenCenterAndEdge => _amountOfRoadNodesBetweenCenterAndEdge;
+    public int AmountOfRoadNodes => _amountOfRoadNodesBetweenCenterAndEdge * 2 + 3;
+    public int CenterRoadNode => _amountOfRoadNodesBetweenCenterAndEdge + 2;
 
     [Header("GeneralIslandSettings")][Space] 
-
     [SerializeField] private int _islandRadius;
-    public int IslandSize {get => _islandRadius * 2 + 1;}
+    public int IslandSize => _islandRadius * 2 + 1;
 
-    public int MiddleIndex {get => _islandRadius;}
+    public int MiddleIndex => _islandRadius;
 
     [SerializeField] private int _islandMaxHeight;
-    public int IslandMaxHeight {get => _islandMaxHeight;}
+    public int IslandMaxHeight => _islandMaxHeight;
 
     [SerializeField] private int _islandHeightOffset;
-    public int IslandHeightOffset {get => _islandHeightOffset;}
+    public int IslandHeightOffset => _islandHeightOffset;
     
     [System.Serializable] public struct NoiseSetting 
     {
@@ -89,29 +93,23 @@ public sealed class IslandData : ScriptableObject
     [Header("BiomesGenerationSettings")][Space] 
     
     [SerializeField] private Biome[] _biomes;
-    public Biome[] Biomes {get => _biomes;}
+    public Biome[] Biomes => _biomes;
 
     public NoiseSetting[] BiomeGenerationNoises;
 
     [Header("EnemyBiomeStagesSettings")][Space] 
 
     [SerializeField] private int _maxAmountOfEnemyBiomes;
-    public int MaxAmountOfEnemyBiomes {get => _maxAmountOfEnemyBiomes;}
+    public int MaxAmountOfEnemyBiomes => _maxAmountOfEnemyBiomes;
 
     [Range(1, 10)] [SerializeField] private int _begginingAmountOfEnemyBiomes;
-    public int BegginingAmountOfEnemyBiomes {get => _begginingAmountOfEnemyBiomes;}
+    public int BegginingAmountOfEnemyBiomes => _begginingAmountOfEnemyBiomes;
 
     [SerializeField] private EnemyBiomeStage[] _enemyBiomeStages;
-    public EnemyBiomeStage[] EnemyBiomeStages {get => _enemyBiomeStages;}
-    
-    [SerializeField] private CubeTextures _corruptionBlock;
-    public CubeTextures CorruptionBlock => _corruptionBlock;   
-
-    [SerializeField] private CubeTextures _corruptionBlockOnWater;
-    public CubeTextures CorruptionBlockOnWater => _corruptionBlockOnWater;        
+    public EnemyBiomeStage[] EnemyBiomeStages => _enemyBiomeStages;    
     
     [SerializeField] private int _corruptionLessZeroHeight;
-    public int CorruptionLessZeroHeight {get => _corruptionLessZeroHeight;}
+    public int CorruptionLessZeroHeight => _corruptionLessZeroHeight;
 
 
     [System.Serializable] public struct EnemyBiomeStage
@@ -119,37 +117,37 @@ public sealed class IslandData : ScriptableObject
         public DecorationModule DecorationsModule;
 
         [SerializeField] private int _enemyBiomeRadius;
-        public int EnemyBiomeRadius {get => _enemyBiomeRadius;}
+        public int EnemyBiomeRadius => _enemyBiomeRadius;
         
         public AnimationCurve EnemyBiomeEdgeReductionCurve;
     }
 
     [Header("IslandShapeSettings")][Space] 
     [SerializeField] private SmoothingType _smoothingType;
-    public SmoothingType IslandSmoothingType {get => _smoothingType;}
+    public SmoothingType IslandSmoothingType => _smoothingType;
     
     [Range(0f, 1f)]
     [SerializeField] private float _smoothingStrength;
-    public float SmoothingStrength {get => _smoothingStrength;}
+    public float SmoothingStrength => _smoothingStrength;
 
     [Header("IslandBordersSettings")][Space] 
 
     [SerializeField] private bool _clearSingleEmptyBlocks;
-    public bool ClearSingleEmptyBlocks {get => _clearSingleEmptyBlocks;}
+    public bool ClearSingleEmptyBlocks => _clearSingleEmptyBlocks;
 
     [SerializeField] private bool _clearSingleSolidBlocks;
-    public bool ClearSingleSolidBlocks {get => _clearSingleSolidBlocks;}
+    public bool ClearSingleSolidBlocks => _clearSingleSolidBlocks;
 
     [SerializeField] private AnimationCurve _borderCurve;
-    public AnimationCurve BorderCurve {get => _borderCurve;}
+    public AnimationCurve BorderCurve => _borderCurve;
 
     [Range(0f, 0.99f)]
     [SerializeField] private float _edgePrecantageCutout;
-    public float EdgePrecantageCutout {get => _edgePrecantageCutout;}
+    public float EdgePrecantageCutout => _edgePrecantageCutout;
 
     [Range(0f, 1f)]
     [SerializeField] private float _edgeRandomAdditionalHeight;
-    public float EdgeRandomAdditionalHeight {get => _edgeRandomAdditionalHeight;}   
+    public float EdgeRandomAdditionalHeight => _edgeRandomAdditionalHeight;   
     
     public enum SmoothingType
     {
@@ -161,11 +159,11 @@ public sealed class IslandData : ScriptableObject
     [Header("IslandCenterFlatSettings")][Space] 
 
     [SerializeField] private bool _centerShouldBeFlat;
-    public bool CenterShouldBeFlat {get => _centerShouldBeFlat;}
+    public bool CenterShouldBeFlat => _centerShouldBeFlat;
 
     [SerializeField] private int _flatRadius;
-    public int FlatRadius {get => _flatRadius;}
+    public int FlatRadius => _flatRadius;
 
     [SerializeField] private int _flatHeightIncrease;
-    public int FlatHeightIncrease {get => _flatHeightIncrease;}
+    public int FlatHeightIncrease => _flatHeightIncrease;
 }

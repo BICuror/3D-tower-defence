@@ -55,6 +55,7 @@ public class HealthBar : MonoBehaviour
         _lastSetHealth = health;
         _currentDisplayedHealth = health;
         _lastSetHealthDifferecne = health;
+        SetToDefaultPosition();
         SetPropertyBlock(health, health);
     }
 
@@ -123,8 +124,6 @@ public class HealthBar : MonoBehaviour
         if (_currentHealthTween != null && _currentHealthTween.IsPlaying()) _currentHealthTween.Kill();
         if (_currentHealthDifferenceTween != null && _currentHealthDifferenceTween.IsPlaying()) _currentHealthDifferenceTween.Kill();
         StopAllCoroutines();
-
-        ShakeSlider();
 
         float healthDifference = currentHealth;
         if (currentHealth < _lastSetHealthDifferecne) healthDifference = _lastSetHealthDifferecne;

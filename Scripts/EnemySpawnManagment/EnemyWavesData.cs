@@ -1,8 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EnemyWavesData", menuName = "BlockTowerDefence/EnemyWavesData")]
+[CreateAssetMenu(fileName = "EnemyWavesData", menuName = "SpawnManagement/EnemyWavesData")]
 
 public class EnemyWavesData : ScriptableObject
 {
