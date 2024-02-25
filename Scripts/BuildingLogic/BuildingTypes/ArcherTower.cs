@@ -1,10 +1,9 @@
 using UnityEngine;
 
-public sealed class ArcherTower : MonoBehaviour
+public sealed class ArcherTower : CombatBuilding
 {
     [Header("Stats")]
     [SerializeField] private float _arrowSpeed;
-    [SerializeField] private int _arrowDamage;
 
     [Header("Links")]
     [SerializeField] private Arrow _arrowPrefab;
@@ -39,8 +38,10 @@ public sealed class ArcherTower : MonoBehaviour
         currentArrow.gameObject.SetActive(true);
 
         currentArrow.SetEffects(_applyEffectContainer.GetApplyEffects());
-        currentArrow.SetContactDamage(_arrowDamage);
+        currentArrow.SetContactDamage(Damage);
 
         currentArrow.GetRigidbody().AddForce(currentArrow.transform.forward * _arrowSpeed, ForceMode.Impulse);
     }
+
+    private void OnDestroy() => _arrowObjectPool.DestroyPool();
 }

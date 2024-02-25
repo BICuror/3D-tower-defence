@@ -19,7 +19,7 @@ public abstract class Shaker : MonoBehaviour
 
         if (_currentTween != null && _currentTween.IsPlaying())
         {
-            _currentTween.Kill();
+            _currentTween.Complete();
         }
         
         _currentTween = _mesh.DOShakeScale(_shakeDuration, _shakeStrength);
@@ -32,5 +32,6 @@ public abstract class Shaker : MonoBehaviour
         _mesh.localScale = _defaultScale;
     }
 
-    private void OnDisable() => _mesh.DOKill();
+    private void OnDisable() => _currentTween.Complete();
+    private void OnDestroy() => _currentTween.Kill();
 }

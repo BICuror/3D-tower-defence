@@ -10,6 +10,7 @@ public sealed class Bomb : DraggableObject
     [SerializeField] private float _explotionRadius;
     [SerializeField] private float _explotionDamage;
     [SerializeField] private float _preparationTime; 
+    public void SetExplotionDamage(float value) => _explotionDamage = value;
 
     public UnityEvent Exploded;
 
@@ -17,7 +18,7 @@ public sealed class Bomb : DraggableObject
 
     private void PrepeareToExplode()
     {
-        PickUp();
+        SetDraggableState(false);
 
         Invoke("Explode", _preparationTime);
     }

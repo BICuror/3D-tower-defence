@@ -3,6 +3,8 @@ using UnityEngine.Events;
 
 public class EnemyHealth : EntityHealth
 {
+    [SerializeField] private float _attackDamage = 10f;
+
     public UnityEvent<EnemyHealth> EnemyDeathEvent; 
 
     private float _attackMultipluer;
@@ -13,16 +15,23 @@ public class EnemyHealth : EntityHealth
 
         _incomingDamageMultipluer = enemyData.IncomingDamageMultipluer;
 
-        HealFully();
-
         EnableHealthBar();
+
+        HealFully();
+    }
+
+    public void MultiplyMaxHealth(float value) 
+    {
+        _maxHealth *= value;
+        
+        HealFully();
     }
 
     private void OnCollisionEnter(Collision other) 
     {
         if (other.gameObject.TryGetComponent(out BuildingHealth buildingHealth))
         {
-            buildingHealth.GetHurt(GetCurrentHealth());
+            buildingHealth.GetHurt(_attackDamage);
 
             Die();
         }    

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public abstract class AreaDetector <T> : MonoBehaviour where T: MonoBehaviour 
+public abstract class AreaDetector <T> : AreaDetectorBase where T: MonoBehaviour 
 {
     protected List<T> _list = new List<T>();
 
@@ -46,7 +46,10 @@ public abstract class AreaDetector <T> : MonoBehaviour where T: MonoBehaviour
         RemovedComponent.Invoke(component);
     }
 
-    private void OnDestroy()
+    private void OnDisable() => RemoveAll();
+    private void OnDestroy() => RemoveAll();
+
+    private void RemoveAll()
     {
         while(_list.Count > 0)
         {

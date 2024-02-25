@@ -9,7 +9,7 @@ public sealed class EnemyFactory : MonoBehaviour
 
     private ObjectPool<EnemyBootstrap> _enemyPool;
 
-    private void Awake()
+    private void Start()
     {
         _instance = this;
 

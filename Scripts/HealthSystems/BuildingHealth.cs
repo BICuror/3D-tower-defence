@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public sealed class BuildingHealth : EntityHealth
+public class BuildingHealth : EntityHealth
 {
     public UnityEvent<BuildingHealth> BuildingDeathEvent;
 
-    private void Start()
+    protected void Start()
     {
         Healed.AddListener(CheckToHideHealthBar);
         Damaged.AddListener(CheckToActivateHealthBar);

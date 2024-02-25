@@ -41,8 +41,9 @@ public sealed class SpecialEnemyObject : MonoBehaviour
         _enemyHealth.DeathEvent.AddListener(StartDisappearing);
     }
 
-    private void StartDisappearing(GameObject enemy)
+    public void StartDisappearing(GameObject enemy)
     {
+        if (gameObject.activeSelf == false) return;
         transform.SetParent(null);
 
         StartCoroutine(Disappear());

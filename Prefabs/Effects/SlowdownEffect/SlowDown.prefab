@@ -52,10 +52,10 @@ VisualEffect:
   m_PropertySheet:
     m_Float:
       m_Array:
-      - m_Value: 2
+      - m_Value: 2.3
         m_Name: Size
         m_Overridden: 1
-      - m_Value: 1
+      - m_Value: 1.5
         m_Name: MaxLifeTime
         m_Overridden: 1
     m_Vector2f:
@@ -64,7 +64,7 @@ VisualEffect:
       m_Array: []
     m_Vector4f:
       m_Array:
-      - m_Value: {x: 0, y: 8.094401, z: 8.094401, w: 0}
+      - m_Value: {x: 2, y: 2, z: 2, w: 1}
         m_Name: Color
         m_Overridden: 1
     m_Uint:
@@ -82,7 +82,7 @@ VisualEffect:
       - m_Value: {fileID: 4300002, guid: 8a5afb059ccf78d4599033a4c1421d72, type: 3}
         m_Name: Mesh
         m_Overridden: 1
-      - m_Value: {fileID: 2800000, guid: 2264781709d8c5e4c9db88483660f161, type: 3}
+      - m_Value: {fileID: 2800000, guid: 3627aafa374e1d246bd68a97adbaeba3, type: 3}
         m_Name: Texture
         m_Overridden: 1
     m_Bool:

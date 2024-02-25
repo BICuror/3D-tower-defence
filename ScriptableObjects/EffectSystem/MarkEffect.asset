@@ -16,4 +16,4 @@ MonoBehaviour:
   _instantiationHeight: 2
   _initialEffectPoolSize: 4
   _effectDuration: 3
-  _incomingDamageMultipluerAdded: 0.5
+  _incomingDamageMultipluerAdded: 0.75

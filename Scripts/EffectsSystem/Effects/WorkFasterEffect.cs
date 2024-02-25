@@ -5,6 +5,7 @@ using UnityEngine;
 public sealed class WorkFasterEffect : PermanentEffect
 {
     [Range(0f, 1f)] [SerializeField] private float _rechargeCutdownStrength;
+    public float EffectStrength => _rechargeCutdownStrength;
 
     public override bool CanBeApplied(EntityComponentsContainer componentsContainer) => componentsContainer.HasTaskCycle();
 

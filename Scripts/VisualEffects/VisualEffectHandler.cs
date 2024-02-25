@@ -1,8 +1,11 @@
 using UnityEngine;
 using UnityEngine.VFX;
+using UnityEngine.Events;
 
 public sealed class VisualEffectHandler : MonoBehaviour
 {
+    public UnityEvent EffectPlayed;
+
     [SerializeField] private StopActionType _stopAction;
 
     [SerializeField] private VisualEffect _visualEffect;
@@ -18,12 +21,13 @@ public sealed class VisualEffectHandler : MonoBehaviour
     {
         _visualEffect.gameObject.SetActive(true);
 
+        EffectPlayed.Invoke();
+
         switch(_stopAction)
         {
             case StopActionType.Disable: Invoke("DisableThisObject", _disableTime); break;
             case StopActionType.Destroy: Invoke("DestroyThisObject", _disableTime); break;
-        }
-              
+        }    
     }
 
     private void DisableThisObject()

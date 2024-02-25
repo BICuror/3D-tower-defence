@@ -16,4 +16,4 @@ MonoBehaviour:
   _instantiationHeight: -0.3
   _initialEffectPoolSize: 1
   _tickDuration: 0.25
-  _healStrength: 0.06
+  _healStrength: 0.05

@@ -25,7 +25,7 @@ public sealed class EnemyEffectStand : MonoBehaviour
     {
         for (int i = 0; i < _applyEffects.Length; i++)
         {
-            enemyEffectManager.RemoveEffect(_applyEffects[i]);
+            enemyEffectManager.TryToRemoveEffect(_applyEffects[i]);
         }
     }
 }

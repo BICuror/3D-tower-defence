@@ -6,6 +6,7 @@ public sealed class HealingTower : MonoBehaviour
 {
     [Header("Stats")]
     [SerializeField] private float _healAmount;
+    public float HealAmount => _healAmount;
 
     [Header("Links")]
     [SerializeField] private BuildingHealthAreaScaner _buildingHealthAreaScaner;
@@ -24,20 +25,23 @@ public sealed class HealingTower : MonoBehaviour
         _buildingTaskCycle.ShouldWorkDelegate = ShouldWork;
         _buildingTaskCycle.TaskPerformed.AddListener(HealBuilding);
         
-
-        _buildingHealthAreaScaner.HealthComponentAdded.AddListener(TrySettingNewBuilding);
-        _buildingHealthAreaScaner.HealthComponentRemoved.AddListener(TryRemovingBuilding);
+        _buildingHealthAreaScaner.HealthComponentAdded.AddListener((EntityHealth health) => TrySetNewBuilding());
+        _buildingHealthAreaScaner.HealthComponentRemoved.AddListener(TryRemoveBuilding);
 
         _buildingHealthAreaScaner.HealthComponentAdded.AddListener(SubscribeToBuilding);
         _buildingHealthAreaScaner.HealthComponentRemoved.AddListener(UnsubscribeToBuilding);
 
         _building = GetComponent<Building>();
-        _building.PickedUp.AddListener(_beamSystem.DisableBeam);
         _building.PickedUp.AddListener(ClearBuilding);
-        _building.BuildCompleted.AddListener(_beamSystem.SetBeamPositionToSource);
+        _building.BuildCompleted.RemoveListener(_buildingTaskCycle.StartCycle);
+        _building.BuildCompleted.AddListener(TrySetNewBuilding);
     }
 
-    private void ClearBuilding() => _currentBuilding = null;
+    private void ClearBuilding()
+    {
+        _beamSystem.DisableBeam();
+        _currentBuilding = null;
+    }
 
     private void SubscribeToBuilding(EntityHealth building) => building.Damaged.AddListener(TryToHealOnHurt);
     private void UnsubscribeToBuilding(EntityHealth building) => building.Damaged.RemoveListener(TryToHealOnHurt);
@@ -45,6 +49,7 @@ public sealed class HealingTower : MonoBehaviour
     private bool ShouldWork() 
     {
         if (_buildingHealthAreaScaner.IsEmpty()) return false;
+        if (_building.IsBuilt() == false) return false;
 
         IReadOnlyList<EntityHealth> buildings = _buildingHealthAreaScaner.GetHealthComponentsList();
 
@@ -55,28 +60,30 @@ public sealed class HealingTower : MonoBehaviour
 
         if (_currentBuilding != null) 
         {
-            _currentBuilding = null;
-            _beamSystem.ReturnBeam(); 
+            TryRemoveBuilding(_currentBuilding);
         }
         return false;
     }
+    
 
-    private void TrySettingNewBuilding(EntityHealth building)
+    private void TrySetNewBuilding()
     {
-        if (_building.IsBuilt() && _currentBuilding == null && ShouldWork())
+        if (_currentBuilding == null && ShouldWork())
         {
             SetNewBuilding();
         }
     }
 
-    private void TryRemovingBuilding(EntityHealth building)
+    private void TryRemoveBuilding(EntityHealth building)
     {
         if (_currentBuilding == (building as BuildingHealth))
         {
-            _currentBuilding = null;
+            ClearBuilding();
 
-            if (ShouldWork()) SetNewBuilding();
-            else _beamSystem.ReturnBeam();
+            if (ShouldWork())
+            {
+                SetNewBuilding();
+            }
         }
     }
 
@@ -89,6 +96,15 @@ public sealed class HealingTower : MonoBehaviour
     }
 
     private void SetNewBuilding()
+    {
+        _currentBuilding = FindMostHurtBuilding();
+
+        _beamSystem.SetTarget(_currentBuilding.transform);
+
+        _buildingTaskCycle.StartCycle();
+    }
+
+    private EntityHealth FindMostHurtBuilding()
     {
         float leastHp = 1f;
 
@@ -107,11 +123,7 @@ public sealed class HealingTower : MonoBehaviour
             }
         }
 
-        _currentBuilding = buildings[index];
-
-        _buildingTaskCycle.StartCycle();
-
-        _beamSystem.StartBeamTranstionToPosition(_currentBuilding.transform);
+        return buildings[index];
     }
 
     private void HealBuilding()
@@ -120,16 +132,7 @@ public sealed class HealingTower : MonoBehaviour
 
         if (_currentBuilding.GetHealthPrcentage() == 1f)
         {
-            _currentBuilding = null;
-
-            if (ShouldWork()) 
-            {
-                SetNewBuilding();
-            }
-            else
-            {
-                _beamSystem.ReturnBeam();
-            }
+            TryRemoveBuilding(_currentBuilding);
         }
     }
 }

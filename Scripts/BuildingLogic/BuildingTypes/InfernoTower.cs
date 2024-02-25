@@ -2,28 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class InfernoTower : MonoBehaviour
+public sealed class InfernoTower : CombatBuilding
 {
     [Header("Stats")]
-    [SerializeField] private float _damageAccseleration;
-
-    [SerializeField] private float _baseDamage;
-    private float _currentDamage;
-    
-    [SerializeField] private float _additionalDamagePerEffect;
+    [SerializeField] private AnimationCurve _damageCurve;
+    [SerializeField] private float _damageAccselerationTime;
+    private int _fullAccerationTicks;
+    private float _elapsedTicks;
+    [SerializeField] private float _maxDamage;
 
     [Header("Links")]    
     [SerializeField] private EnemyAreaScaner _enemyAreaScaner;
 
     [SerializeField] private ApplyEffectContainer _applyEffectContainer;
-    
+
     [SerializeField] private BeamSystem _beamSystem;
 
+    private EnemyHealth _currentEnemy;
     private BuildingTaskCycle _buildingTaskCycle;
-
     private Building _building;
 
-    private EnemyHealth _currentEnemy;
+    public override string GetDamageValue() => Damage.ToString() + " / " + _maxDamage.ToString();
 
     private void Start()
     {
@@ -31,69 +30,81 @@ public sealed class InfernoTower : MonoBehaviour
         _buildingTaskCycle.ShouldWorkDelegate = ShouldWork;
         _buildingTaskCycle.TaskPerformed.AddListener(Beam);
 
-        _beamSystem.BeamConnected.AddListener(_buildingTaskCycle.StartCycle);
+        _fullAccerationTicks = Mathf.RoundToInt(_damageAccselerationTime / _buildingTaskCycle.RechargeTime);
 
         _building = GetComponent<Building>();
-        _building.PickedUp.AddListener(_beamSystem.DisableBeam);
         _building.PickedUp.AddListener(ClearEnemy);
-        _building.BuildCompleted.RemoveListener(_buildingTaskCycle.StartCycle);
-        _building.BuildCompleted.AddListener(_beamSystem.SetBeamPositionToSource);
-        _building.BuildCompleted.AddListener(TrySettingFirstEnemy);
+        _building.BuildCompleted.AddListener(SetRandomNewEnemy);
 
-        _enemyAreaScaner.EnemyEnteredArea.AddListener(TrySettingNewEnemy);
-
-        _enemyAreaScaner.EnemyExitedArea.AddListener(TryRemovingEnemy);
+        _enemyAreaScaner.EnemyEnteredArea.AddListener(TrySetNewEnemy);
+        _enemyAreaScaner.EnemyExitedArea.AddListener(TryRemoveEnemy);
     }  
 
-    private void ClearEnemy() => _currentEnemy = null;
-    
+    private void ClearEnemy()
+    {
+        _beamSystem.DisableBeam();
+        _currentEnemy = null;
+    }
+
     private bool ShouldWork() => _enemyAreaScaner.Empty() == false;
 
-    private void TrySettingFirstEnemy()
+    private void SetRandomNewEnemy()
     {
         if (ShouldWork())
         {
-            TrySettingNewEnemy(_enemyAreaScaner.GetFirstEnemy());
+            SetNewEnemy(_enemyAreaScaner.GetFirstEnemy());
         }
     }
 
-    private void TrySettingNewEnemy(EnemyHealth enemy)
+    private void TrySetNewEnemy(EnemyHealth enemy)
     {
         if (_currentEnemy == null && _building.IsBuilt())
         {
-            _currentEnemy = enemy;
-
-            _currentDamage = _baseDamage;
-
-            _beamSystem.StartBeamTranstionToPosition(enemy.transform);
+            SetNewEnemy(enemy);
         }
     }
 
-    private void TryRemovingEnemy(EnemyHealth enemy)
+    private void SetNewEnemy(EnemyHealth enemyHealth)
+    {
+        if (_currentEnemy == null)
+        {
+            _beamSystem.SetTarget(enemyHealth.transform);
+
+            _currentEnemy = enemyHealth;
+
+            _elapsedTicks = 0f;
+        }
+    }
+
+    private void TryRemoveEnemy(EnemyHealth enemy)
     {
         if (_currentEnemy == enemy)
         {
-            _currentEnemy = null;
-
-            _buildingTaskCycle.StopCycle();
+            ClearEnemy();
 
             if (_enemyAreaScaner.Empty() == false) 
             {
-                TrySettingNewEnemy(_enemyAreaScaner.GetFirstEnemy());
+                SetNewEnemy(_enemyAreaScaner.GetFirstEnemy());
             }
-            else
+            else 
             {
-                _beamSystem.ReturnBeam();
+                _buildingTaskCycle.StopCycle();
             }
         }
     }
 
     private void Beam()
     {
-        _currentDamage *= _damageAccseleration;
-        _currentEnemy.GetHurt(_currentDamage + _additionalDamagePerEffect * _applyEffectContainer.GetAmountOfEffects());
+        _elapsedTicks += 1;
+        _elapsedTicks = Mathf.Min(_elapsedTicks, _fullAccerationTicks);
 
-        if (_currentEnemy.IsAlive()) ApplyEffectsToEnemy();
+        float evaluatedTime = _elapsedTicks / _fullAccerationTicks;
+        
+        _beamSystem.SetAlpha(evaluatedTime);
+
+        _currentEnemy.GetHurt(Mathf.Lerp(Damage, _maxDamage, _damageCurve.Evaluate(evaluatedTime)));
+
+        if (_currentEnemy != null && _currentEnemy.IsAlive()) ApplyEffectsToEnemy();
     } 
 
     private void ApplyEffectsToEnemy()

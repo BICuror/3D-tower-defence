@@ -6,7 +6,7 @@ public sealed class EnemyRanger : MonoBehaviour
 {
     [Header("Stats")]
     [SerializeField] private float _projectileSpeed;
-    [SerializeField] private int _projectileDamage;
+    [SerializeField] private float _projectileDamage;
     
     [SerializeField] private List<Effect> _effectsToApply;
 

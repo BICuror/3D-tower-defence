@@ -25,7 +25,7 @@ public sealed class BuildingEffectStand : MonoBehaviour
     {
         for (int i = 0; i < _applyEffects.Length; i++)
         {
-            draggable.RemoveEffect(_applyEffects[i]);
+            draggable.TryToRemoveEffect(_applyEffects[i]);
         }
     }
 }

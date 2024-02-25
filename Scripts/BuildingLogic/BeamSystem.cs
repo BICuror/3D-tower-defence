@@ -1,42 +1,54 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 public sealed class BeamSystem : MonoBehaviour
 {
-    enum BeamType
-    {
-        Static,
-        Dynamic
-    }
-
     [SerializeField] private BeamType _beamType;
 
-    [SerializeField] private int _beamTransitionFrameDuration;
+    [SerializeField] private Material _beamMaterial;
 
     [SerializeField] private LineRenderer _lineRenderer;
 
     [SerializeField] private Transform _beamSource;
 
-    public UnityEvent BeamConnected;
+    [SerializeField] private MeshRenderer[] _additionalRenderers;
 
-    private Vector3 _currentBeamPosition;
-
-    private Transform _currentBeamTarget;
+    private Transform _target;
 
     private YieldInstruction _rechargeInstruction;
 
     private void Awake()
     {
         _rechargeInstruction = new WaitForFixedUpdate();
-    
-        _currentBeamPosition = _beamSource.position;
+
+        _beamMaterial = new Material(_beamMaterial);
+
+        _lineRenderer.sharedMaterial = _beamMaterial;
+
+        foreach (MeshRenderer renderer in _additionalRenderers)
+        {
+            renderer.sharedMaterial = _beamMaterial;
+        }
     }
 
-    public void ReturnBeam() => StartBeamTranstionToPosition(_beamSource);
+    public void SetAlpha(float alpha)
+    {
+        _beamMaterial.SetFloat("Alpha", alpha);
+    }
 
-    public void SetBeamPositionToSource() => _currentBeamPosition = _beamSource.position;
+    public void SetTarget(Transform target)
+    {
+        StopAllCoroutines();
+ 
+        _lineRenderer.positionCount = 2;
+
+        _target = target;
+
+        UpdateLinePositions();
+
+        if (_beamType == BeamType.Dynamic) StartCoroutine(KeepUpBeamToTarget());
+    }
 
     public void DisableBeam()
     {
@@ -44,52 +56,31 @@ public sealed class BeamSystem : MonoBehaviour
 
         _lineRenderer.positionCount = 0;
 
-        _currentBeamTarget = null;
+        _target = null;
 
-        _currentBeamPosition = _beamSource.position;
-    }
-
-    public void StartBeamTranstionToPosition(Transform target) 
-    {
-        if (_currentBeamTarget != null && _currentBeamTarget == target) return;
-        _currentBeamTarget = target;
-
-        StopAllCoroutines();
-
-        _lineRenderer.positionCount = 2;
-        _lineRenderer.SetPositions(new Vector3[2]{_beamSource.position, _currentBeamPosition});
-    
-        StartCoroutine(TransformBeamToPosition());
-    }
-
-    private IEnumerator TransformBeamToPosition()
-    {
-        Vector3 startPosition = _currentBeamPosition;
-
-        for (float i = 0; i <= _beamTransitionFrameDuration; i++)
-        {
-            yield return _rechargeInstruction;
-
-            _currentBeamPosition = Vector3.Lerp(startPosition, _currentBeamTarget.position, i / (float)_beamTransitionFrameDuration);
-        
-            _lineRenderer.SetPosition(1, _currentBeamPosition);
-        }
-
-        if (_beamSource == _currentBeamTarget) DisableBeam();
-        else if (_beamType == BeamType.Dynamic) StartCoroutine(KeepUpBeamToTarget());
-
-        BeamConnected.Invoke();
+        SetAlpha(0);
     }
 
     private IEnumerator KeepUpBeamToTarget()
     {
         while (true)
-        {
-            _currentBeamPosition = _currentBeamTarget.position;
-
-            _lineRenderer.SetPosition(1, _currentBeamTarget.position);
+        {   
+            UpdateLinePositions();
 
             yield return _rechargeInstruction;
         }
     }
+
+    private void UpdateLinePositions()
+    {
+        _lineRenderer.SetPosition(0, _beamSource.position);
+
+        _lineRenderer.SetPosition(1, _target.position);
+    }
 }
+
+public enum BeamType
+{
+    Dynamic,
+    Static
+} 

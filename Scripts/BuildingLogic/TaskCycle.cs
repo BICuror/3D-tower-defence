@@ -27,7 +27,7 @@ public class TaskCycle : MonoBehaviour
 
     private YieldInstruction _rechargeInstruction;
 
-    private void Awake() => _rechargeInstruction = new WaitForSeconds(_rechargeTime);
+    protected void Awake() => _rechargeInstruction = new WaitForSeconds(_rechargeTime);
 
     public void StartCycle() => Recharge();
     

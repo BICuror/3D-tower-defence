@@ -15,5 +15,5 @@ MonoBehaviour:
   _effectPrefab: {fileID: 6330811911315633617, guid: a31cdbe8aaad9e24db657750c66655b9, type: 3}
   _instantiationHeight: 0
   _initialEffectPoolSize: 3
-  _tickDuration: 0.4
-  _damage: 1.33
+  _tickDuration: 0.3
+  _damage: 0.5

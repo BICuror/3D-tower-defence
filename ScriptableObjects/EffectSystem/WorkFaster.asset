@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e2879e8a06893b4fa20068450a2a2eb, type: 3}
   m_Name: WorkFaster
   m_EditorClassIdentifier: 
-  _uIMaterial: {fileID: 2100000, guid: 1bbdd443a35389b40bf17cd6fa26fe8a, type: 2}
   _effectPrefab: {fileID: 1456654861666062299, guid: 6720f4f1703cef941a05e2948a90a811, type: 3}
-  _initialEffectPoolSize: 0
-  _rechargeCutdownStrength: 0.208
+  _instantiationHeight: 0
+  _initialEffectPoolSize: 3
+  _rechargeCutdownStrength: 0.2

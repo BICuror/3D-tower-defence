@@ -20,7 +20,7 @@ public class HealthBar : MonoBehaviour
 
     #region HealthDifferenceTweeningSettings
     private float _healthDifferenceDecreaseTime = 0.2f;
-    private float _timeBeforeDecreasingHealthDifference = 0.8f;
+    private float _timeBeforeDecreasingHealthDifference = 0.3f;
     private YieldInstruction _healthDifferenceChangeWait;
     private Tween _currentHealthDifferenceTween;
     #endregion
@@ -44,18 +44,11 @@ public class HealthBar : MonoBehaviour
         _healthDifferenceChangeWait = new WaitForSeconds(_timeBeforeDecreasingHealthDifference);
     }
 
-    private void OnDisable() 
-    {
-        transform.DOKill();
-        StopAllCoroutines();
-    }    
-
     public void SetValue(float health) 
     {
         _lastSetHealth = health;
         _currentDisplayedHealth = health;
         _lastSetHealthDifferecne = health;
-        SetToDefaultPosition();
         SetPropertyBlock(health, health);
     }
 
@@ -65,14 +58,7 @@ public class HealthBar : MonoBehaviour
         _materialPropertyBlock.SetFloat("HealthDifference", healthDifference);
         _meshRenderer.SetPropertyBlock(_materialPropertyBlock);
     }
-
-    private void SetToDefaultPosition()
-    {
-        transform.localRotation = Quaternion.identity;
-
-        transform.localScale = _defaultScale;
-    }
-
+    
     #region Decrease
     public void DecreaseValue(float currentHealth, float healthDifference)
     {
@@ -86,6 +72,7 @@ public class HealthBar : MonoBehaviour
         DecreaseCurrentHealth();
         
         StopAllCoroutines();
+        
         StartCoroutine(DecreaseHealthDifference());
     }
 
@@ -109,12 +96,11 @@ public class HealthBar : MonoBehaviour
         yield return _healthDifferenceChangeWait;
 
         _currentHealthDifferenceTween = DOVirtual.Float(_lastSetHealthDifferecne, _lastSetHealth, _healthDifferenceDecreaseTime, SetCurrentHealthDifference);
-
-        void SetCurrentHealthDifference(float currentHealth)
-        {
-            _lastSetHealthDifferecne = currentHealth;
-            SetPropertyBlock(_currentDisplayedHealth, _lastSetHealthDifferecne);
-        }
+    }
+    private void SetCurrentHealthDifference(float currentHealth)
+    { 
+        _lastSetHealthDifferecne = currentHealth;
+        SetPropertyBlock(_currentDisplayedHealth, _lastSetHealthDifferecne);
     }
     
     #endregion
@@ -128,21 +114,31 @@ public class HealthBar : MonoBehaviour
         float healthDifference = currentHealth;
         if (currentHealth < _lastSetHealthDifferecne) healthDifference = _lastSetHealthDifferecne;
             
-        SetPropertyBlock(currentHealth, healthDifference);
+        SetPropertyBlock(currentHealth, currentHealth);
     }
 
     private void ShakeSlider()
     {
-        if (_shakeRotationTween != null && _shakeRotationTween.IsPlaying() == true)
-        {
-            _shakeRotationTween.Kill();
-            _shakeScaleTween.Kill();
-            SetToDefaultPosition();
-        }
+        CompleteAllTweens();
 
         _shakeRotationTween = transform.DOShakeRotation(_shakeDuration, _shakeRotationStrength);
         _shakeScaleTween = transform.DOShakeScale(_shakeDuration, _shakeScaleStrength);
     }
+
+    private void CompleteAllTweens()
+    {
+        if (_shakeRotationTween != null && _shakeRotationTween.IsPlaying() == true)
+        {
+            _shakeRotationTween.Complete();
+            _shakeScaleTween.Complete();
+        }
+    }
+
+    private void OnDisable() 
+    {
+        CompleteAllTweens();
+        StopAllCoroutines();
+    }    
 
     private void OnDestroy() => transform.DOKill();
 }

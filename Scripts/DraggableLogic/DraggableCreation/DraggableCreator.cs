@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
+using Zenject;
 
 public sealed class DraggableCreator : MonoBehaviour 
 {
@@ -21,6 +22,8 @@ public sealed class DraggableCreator : MonoBehaviour
     [SerializeField] private Launcher _defaultLauncherPrefab;
     
     private YieldInstruction _yieldInstruction = new WaitForFixedUpdate(); 
+
+    [Inject] private DiContainer _diContainer;
     
     public void CreateDraggableOnPosition(DraggableObject draggablePrefab, Vector3 centerPosition, Vector3 finalPosition)
     {       
@@ -58,7 +61,7 @@ public sealed class DraggableCreator : MonoBehaviour
     #region LauncherCreation
     private Launcher CreateLauncher(Launcher launcherPrefab, Vector3 centerPosition, Vector3 finalPosition)
     {
-        Launcher launcher = Instantiate(launcherPrefab, centerPosition, Quaternion.identity);
+        Launcher launcher = _diContainer.InstantiatePrefab(launcherPrefab.gameObject, centerPosition, Quaternion.identity, null).GetComponent<Launcher>();
 
         StartCoroutine(LaunchLauncher(launcher, finalPosition));
 
@@ -97,29 +100,31 @@ public sealed class DraggableCreator : MonoBehaviour
 
         int currentRadius = radius;
 
+        Vector2Int roundedCenterPosition = new Vector2Int(Mathf.RoundToInt(centerPosition.x), Mathf.RoundToInt(centerPosition.z));
+
         while(allPossiblePositions.Count == 0)
         {
             currentRadius++;
 
-            allPossiblePositions.AddRange(GetPossiblePositionsInRadius(centerPosition, currentRadius, terrainLayer));
+            allPossiblePositions.AddRange(GetPossiblePositionsInRadius(roundedCenterPosition, currentRadius, terrainLayer));
         }
         
         return allPossiblePositions[Random.Range(0, allPossiblePositions.Count)];
     }
 
-    private List<Vector3> GetPossiblePositionsInRadius(Vector3 centerPosition, float radius, LayerSetting terrainLayer)
+    private List<Vector3> GetPossiblePositionsInRadius(Vector2Int roundedCenterPosition, int radius, LayerSetting terrainLayer)
     {
         List<Vector3> possiblePositions = new List<Vector3>();
 
-        float xMinPosition = centerPosition.x - radius;
-        float xMaxPosition = centerPosition.x + radius;
+        int xMinPosition = roundedCenterPosition.x - radius;
+        int xMaxPosition = roundedCenterPosition.x + radius;
 
-        float zMinPosition = centerPosition.z - radius;
-        float zMaxPosition = centerPosition.z + radius;
+        int zMinPosition = roundedCenterPosition.y - radius;
+        int zMaxPosition = roundedCenterPosition.y + radius;
 
-        for (float x = xMinPosition; x <= xMaxPosition; x++)
+        for (int x = xMinPosition; x <= xMaxPosition; x++)
         {
-            for (float z = zMinPosition; z <= zMaxPosition; z++)
+            for (int z = zMinPosition; z <= zMaxPosition; z++)
             {
                 if (x == xMinPosition || z == zMinPosition || x == xMaxPosition || z == zMaxPosition )
                 {

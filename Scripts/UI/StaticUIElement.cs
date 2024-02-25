@@ -1,11 +1,19 @@
-using UnityEngine;
-
 public sealed class StaticUIElement : IngameUIElement
 {
     private void Start()
     {
-        CameraRotationController.Instance.CameraRotationUpdated.AddListener(LookAtCamera);
+        IngameUIElementManager.Instance.AddStaticUIElement(this);
     }
-    
-    private void OnDestroy() => CameraRotationController.Instance.CameraRotationUpdated.RemoveListener(LookAtCamera);
+
+    public void RotateTowardsCamera()
+    {
+        IngameUIElementManager.Instance.RotateElement(this);
+    }
+
+    public void OnEnable() => RotateTowardsCamera();
+
+    private void OnDestroy() 
+    {
+        IngameUIElementManager.Instance.RemoveStaticUIElement(this);
+    }
 }

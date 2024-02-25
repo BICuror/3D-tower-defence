@@ -93,4 +93,14 @@ public sealed class ObjectPool<T>: MonoBehaviour where T: Component
             _pool[i].gameObject.SetActive(false);
         }
     }
+
+    public void DestroyPool()
+    {
+        for (int i = 0; i < _pool.Count; i++)
+        {
+            if (_pool[i] != null) Destroy(_pool[i].gameObject);
+        }
+
+        Destroy(_container.gameObject);
+    }
 }

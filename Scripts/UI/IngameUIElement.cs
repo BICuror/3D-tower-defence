@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class IngameUIElement : MonoBehaviour
+public abstract class IngameUIElement : MonoBehaviour
 {
-    protected void LookAtCamera(Vector3 cameraPosition)
+    public void LookAt(Vector3 position)
     {
-        transform.LookAt(cameraPosition);
+        transform.LookAt(position);
 
         transform.Rotate(90f, 0f, 0f);
     }

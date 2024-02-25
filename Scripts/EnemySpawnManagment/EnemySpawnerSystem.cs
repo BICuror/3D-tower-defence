@@ -3,25 +3,120 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Zenject;
+using WorldGeneration;
 
 public sealed class EnemySpawnerSystem : MonoBehaviour
 {
     [Inject] private WaveManager _waveManager;
-
-    [SerializeField] private float _wheightForWave; 
+    [Inject] private IslandDataContainer _islandDataContainer;
+    private IslandData _islandData => _islandDataContainer.Data;
 
     private List<EnemySpawner> _spawners = new List<EnemySpawner>();
-    [SerializeField] private EnemyWavesData _enemyWavesData;
+
+    public UnityEvent<int> GeneratedEnemiesAmount;
 
     public UnityEvent AllEnemiesDied;
 
-    public UnityEvent<GameObject> EnemySpawned;
+    public UnityEvent<EnemyHealth> EnemySpawned;
+    public UnityEvent<EnemyHealth> EnemyDied;
+    private float _currentHealthMultiplyer;
+    public float HealthMultiplyer => _currentHealthMultiplyer;
+
+    private void InvokeEnemySpawned(EnemyHealth spawnedEnemy) => EnemySpawned.Invoke(spawnedEnemy);
+    private void InvokeEnemyDied(EnemyHealth spawnedEnemy) => EnemyDied.Invoke(spawnedEnemy);
+
+    public void StartWave()
+    {
+        for (int i = 0; i < _spawners.Count; i++)
+        {   
+            _spawners[i].SpawnGroup();
+        }
+    }
+
+    public void GenerateEnemyGroups()
+    {
+        float leftHealthForWave = _islandData.WavesData.WaveHealth * _waveManager.GetCurrentWave();
+
+        int enemiesAmount = 0;
+
+        for (int i = 0; i < _spawners.Count; i++)
+        {   
+            float leftHealthForGroup = leftHealthForWave / (_spawners.Count - i);
+
+            leftHealthForWave -= leftHealthForGroup;
+            
+            List<EnemyData> waveGroup = GenerateEnemyGroup(ref leftHealthForGroup);
+
+            leftHealthForWave += leftHealthForGroup;  
+            
+            enemiesAmount += waveGroup.Count;
+
+            if (i + 1 == _spawners.Count)
+            {
+                Debug.Log("Spawned enemies: for: " + (_islandData.WavesData.WaveHealth * _waveManager.GetCurrentWave() - leftHealthForWave).ToString() + " out of " + (_islandData.WavesData.WaveHealth * _waveManager.GetCurrentWave()).ToString());
+            }
+
+            _spawners[i].SetEnemiesToSpawn(waveGroup);
+        }
+
+        GeneratedEnemiesAmount.Invoke(enemiesAmount);
+    }
+
+    private List<EnemyData> GenerateEnemyGroup(ref float healthLeft)
+    {   
+        EnemyWaveGroup waveGroup = FindSutableRandomGroup();
+
+        List<EnemyData> enemiesToSpawn = new List<EnemyData>();
+        while (true)
+        {
+            for (int enemyTypeIndex = 0; enemyTypeIndex < waveGroup.GroupParts.Length; enemyTypeIndex++)
+            {
+                EnemyWaveGroup.GroupPart currentPart = waveGroup.GroupParts[enemyTypeIndex];
+                
+                int enemyAmount = Random.Range(currentPart.MinAmount, currentPart.MaxAmount);
+
+                for (int enemyIndex = 0; enemyIndex < enemyAmount; enemyIndex++)
+                {
+                    if (healthLeft - currentPart.Data.HealthData.MaxHealth >= 0 || enemiesToSpawn.Count == 0)
+                    {
+                        healthLeft -= currentPart.Data.HealthData.MaxHealth;
+
+                        enemiesToSpawn.Add(currentPart.Data);
+                    }
+                    else
+                    {
+                        return enemiesToSpawn;
+                    }
+                }
+            }
+        }
+    }
+
+    private EnemyWaveGroup FindSutableRandomGroup()
+    {
+        EnemyWaveGroup[] waveGroups = _islandData.WavesData.WaveGroups;
+
+        List<EnemyWaveGroup> sutableGroups = new List<EnemyWaveGroup>();
+
+        int currentWave = _waveManager.GetCurrentWave();
+
+        for (int i = 0; i < waveGroups.Length; i++)
+        {
+            if (waveGroups[i].FirstPossibleWaveEncounter <= currentWave && waveGroups[i].LastPossibleWaveEncounter >= currentWave)
+            {
+                sutableGroups.Add(waveGroups[i]);
+            }
+        }
+
+        return sutableGroups[Random.Range(0, sutableGroups.Count)];
+    }
 
     public void AddSpawner(EnemySpawner spawner)
     {
         _spawners.Add(spawner);
 
         spawner.EnemySpawned.AddListener(InvokeEnemySpawned);
+        spawner.EnemyDied.AddListener(InvokeEnemyDied);
 
         spawner.LastEnemyKilled.AddListener(CheckIfAllEnemiesDied);
     }
@@ -31,64 +126,26 @@ public sealed class EnemySpawnerSystem : MonoBehaviour
         _spawners.Remove(spawner);
 
         spawner.EnemySpawned.RemoveListener(InvokeEnemySpawned);
+        spawner.EnemyDied.RemoveListener(InvokeEnemyDied);
 
         spawner.LastEnemyKilled.RemoveListener(CheckIfAllEnemiesDied);
     }
-
-    private void InvokeEnemySpawned(GameObject spawnedEnemy) => EnemySpawned?.Invoke(spawnedEnemy);
 
     private void CheckIfAllEnemiesDied()
     {
         for (int i = 0; i < _spawners.Count; i++)
         {
-            if (_spawners[i].AllEnemiesDead() == false) return;
+            if (_spawners[i].AllEnemiesDead() == false || _spawners[i].SpawnedAllEnemies() == false) return;
         }        
 
-        AllEnemiesDied?.Invoke();
+        AllEnemiesDied.Invoke();
     }
 
-    public void StartWave()
+    public void KillAllEnemies()
     {
         for (int i = 0; i < _spawners.Count; i++)
-        {   
-            _spawners[i].StartSpawningEnemies(GetEnemyWave());
-        }
-    }
-
-    private List<EnemyData> GetEnemyWave()
-    {
-        List<EnemyData> enemyDatasToSpawn = new List<EnemyData>();
-
-        EnemyWaveGroup currentWaveGroup = _enemyWavesData.PossibleGroups[Random.Range(0, _enemyWavesData.PossibleGroups.Length)];
-
-        float wheightForEnemyTypeInGroup = _wheightForWave / currentWaveGroup.EnemiesInGroup.Length;
-
-        for (int i = 0; i < currentWaveGroup.EnemiesInGroup.Length; i++)
         {
-            EnemyType currentEnemyType = currentWaveGroup.EnemiesInGroup[i].Type;
-
-            float weightLeftForGroup = wheightForEnemyTypeInGroup;
-
-            EnemyWavesData.Enemy[] enemiesOfType = _enemyWavesData.GetEnemies(currentEnemyType);
-
-            for (int y = 0; y < currentWaveGroup.EnemiesInGroup[i].Amount; y++)
-            {
-                for (int wheightIndex = enemiesOfType.Length - 1; wheightIndex > 0; wheightIndex--)
-                {
-                    if (enemiesOfType[wheightIndex].Weight <= weightLeftForGroup)
-                    {
-                        enemyDatasToSpawn.Add(enemiesOfType[wheightIndex].Data);
-
-                        weightLeftForGroup -= enemiesOfType[wheightIndex].Weight;
-
-                        break;
-                    }
-                    
-                    enemyDatasToSpawn.Add(enemiesOfType[0].Data);
-                }
-            }
+            _spawners[i].KillAllEnemies();
         }
-
-        return enemyDatasToSpawn;
     }
 }

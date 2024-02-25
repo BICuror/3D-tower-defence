@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c50cbd951a2245a42926e01bc779094c, type: 3}
   m_Name: RandomRoadAlgorithm
   m_EditorClassIdentifier: 
-  _snapToMainBuildingDistance: 5
+  _snapToMainBuildingDistance: 4
   _maxIteraions: 1000
   _allowedBlocksNerby: 1
   _chanseForRandomDirection: 0.96
-  _chanseForRandomDirectionAfterAllIterations: 0.25
+  _chanseForRandomDirectionAfterAllIterations: 0.416
+  _maxRandomTiles: 25

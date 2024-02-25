@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9cd7db7bf0750948b48a60990533473, type: 3}
   m_Name: WeakEnemyHealthData
   m_EditorClassIdentifier: 
-  _maxHealth: 5
+  _maxHealth: 15
   _incomingDamageMultipluer: 1

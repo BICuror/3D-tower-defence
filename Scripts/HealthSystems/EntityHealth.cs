@@ -18,7 +18,7 @@ public class EntityHealth : MonoBehaviour
 
     [SerializeField] protected HealthBar _healthBar;
 
-    private void Awake() => _currentHealth = _maxHealth;
+    protected void Awake() => _currentHealth = _maxHealth;
 
     public float GetCurrentHealth() => _currentHealth;
     public float GetHealthPrcentage() => _currentHealth / _maxHealth;
@@ -40,7 +40,12 @@ public class EntityHealth : MonoBehaviour
     }
     #endregion
 
-    public void GetHurt(float damage)
+    public void GetHurtPrecent(float precent)
+    {
+        GetHurt(precent * GetMaxHealth());
+    }
+
+    public virtual void GetHurt(float damage)
     {
         if (_isInvinsible) return;
 

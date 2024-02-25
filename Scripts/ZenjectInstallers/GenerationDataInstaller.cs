@@ -1,4 +1,5 @@
 using Zenject;
+using WorldGeneration;
 
 public sealed class GenerationDataInstaller : MonoInstaller
 {

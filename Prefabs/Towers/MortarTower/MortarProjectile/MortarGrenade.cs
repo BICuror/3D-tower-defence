@@ -16,6 +16,8 @@ public sealed class MortarGrenade : PlayerWeapon
     public UnityEvent Enabled;
     public UnityEvent ReachedEnd;
 
+    public UnityEvent Exploded;
+
     private float _explotionDamage;
     public void SetExplotionDamage(float value) => _explotionDamage = value;
 
@@ -78,5 +80,7 @@ public sealed class MortarGrenade : PlayerWeapon
         }
 
         _visualEffectHandler.Play();
+
+        Exploded.Invoke();
     }
 }

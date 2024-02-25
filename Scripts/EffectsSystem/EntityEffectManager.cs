@@ -6,10 +6,11 @@ using UnityEngine.AI;
 
 public class EntityEffectManager : MonoBehaviour
 {
+    [SerializeField] private List<Effect> _effectsImmunities;
     protected bool _effectsCanBeSet = true;
     private EntityComponentsContainer _entityComponentsContainer;
 
-    private List<Effect> _appliedEffects;
+    private List<Effect> _appliedEffects = new List<Effect>();
 
     public UnityEvent<Effect> EffectApplied;
 
@@ -25,18 +26,18 @@ public class EntityEffectManager : MonoBehaviour
     {
         GetComponent<EntityHealth>().DeathEvent.AddListener(RemoveAllEffects);
 
-        _appliedEffects = new List<Effect>();
-
         NavMeshAgent agent = GetComponent<NavMeshAgent>();
         EntityHealth health = GetComponent<EntityHealth>();
         TaskCycle taskCycle = GetComponent<TaskCycle>();
 
         _entityComponentsContainer = new EntityComponentsContainer(health, taskCycle, agent);
     }
+
+    private bool EffectCanBeApplied(Effect effect) => (_effectsCanBeSet && _effectsImmunities.Contains(effect) == false);
     
     public void ApplyEffect(Effect effectToApply)
     {
-        if (_effectsCanBeSet && effectToApply.CanBeApplied(_entityComponentsContainer) && gameObject.activeSelf)
+        if (EffectCanBeApplied(effectToApply) && effectToApply.CanBeApplied(_entityComponentsContainer) && gameObject.activeSelf)
         {
             _appliedEffects.Add(effectToApply);
 
@@ -62,8 +63,16 @@ public class EntityEffectManager : MonoBehaviour
             RemoveEffect(_appliedEffects[_appliedEffects.Count - 1]);
         }   
     }
+
+    public void TryToRemoveEffect(Effect effectToRemove)
+    {
+        if (_appliedEffects.Contains(effectToRemove))
+        {
+            RemoveEffect(effectToRemove);
+        }
+    }
     
-    public void RemoveEffect(Effect effectToRemove)
+    private void RemoveEffect(Effect effectToRemove)
     {
         _appliedEffects.Remove(effectToRemove);
 

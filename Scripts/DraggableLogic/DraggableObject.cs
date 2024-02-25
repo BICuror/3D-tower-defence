@@ -5,6 +5,7 @@ using UnityEngine.Events;
 
 public class DraggableObject : MonoBehaviour, IDraggable
 {  
+    [SerializeField] private PlacementRequirements _placementRequirements;
     [SerializeField] private bool _isDraggable = true;
     private bool _isDragged;
 
@@ -23,6 +24,7 @@ public class DraggableObject : MonoBehaviour, IDraggable
     public bool IsDraggable() => _isDraggable && (_isDragged == false);
     public bool IsPlaced() => _isPlaced;
 
+    public PlacementRequirements GetPlacementRequirements() => _placementRequirements;
     public void PickUp()
     {
         _isPlaced = false;

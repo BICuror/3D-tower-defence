@@ -5,7 +5,10 @@ public sealed class Arrow : PlayerWeapon
 {
     [SerializeField] private VisualEffectHandler _visualEffectHandler;
 
-    private void Awake() => HitSomething.AddListener(OnHitSomehing);
+    private void Awake() 
+    {
+        HitSomething.AddListener(OnHitSomehing);
+    }
 
     private void OnHitSomehing()
     {
@@ -13,6 +16,4 @@ public sealed class Arrow : PlayerWeapon
 
         Rigidbody.velocity = Vector3.zero;
     }
-
-    private void OnBecameInvisible() => gameObject.SetActive(false);
 }

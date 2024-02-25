@@ -1,5 +1,6 @@
 using UnityEngine;
 using Zenject;
+using WorldGeneration;
 
 public class RoadGenerationInstaller : MonoInstaller
 {

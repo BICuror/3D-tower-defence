@@ -16,5 +16,5 @@ MonoBehaviour:
   _instantiationHeight: 0
   _initialEffectPoolSize: 10
   _tickDuration: 0.1
-  _ticksAmount: 5
-  _damage: 0.1
+  _ticksAmount: 6
+  _damage: 0.65
