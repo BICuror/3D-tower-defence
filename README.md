@@ -1,2 +1,1 @@
-A bit outdated project
-Currently trying to implement better architecture desicions and add new content
+A bit outdated project, trying to implement better architecture desicions and add new content
